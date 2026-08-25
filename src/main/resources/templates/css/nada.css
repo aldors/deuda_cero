@@ -1,0 +1,26 @@
+body{
+    background-color: #d1e4e29d;
+    font-family: 'Dosis';
+}
+
+h1{
+    text-align: center;
+    background-color: rgba(88, 106, 107, 0.39);
+}
+
+footer{
+    background-color: rgba(88, 106, 107, 0.39);
+    font-weight: 600;
+}
+
+ul{
+    list-style: none;
+}
+
+a{
+    text-decoration: none;
+}
+
+a:hover{
+    color: purple;
+}

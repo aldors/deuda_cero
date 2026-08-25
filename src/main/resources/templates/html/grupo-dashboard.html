@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Deuda Cero</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Dosis:wght@200..800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="../css/grupo-dashboard.css">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- BARRA LATERAL -->
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <span class="logo-icon">$</span>
+
+            <span>Deuda Cero</span>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="dashboard.html" class="nav-item">
+
+                <span class="nav-icon">⌂</span>
+
+                <span>Inicio</span>
+
+            </a>
+
+
+            <a href="#" class="nav-item active">
+
+                <span class="nav-icon">▣</span>
+
+                <span>Grupo</span>
+
+            </a>
+
+
+            <a href="#" class="nav-item">
+
+                <span class="nav-icon">✉</span>
+
+                <span>Invitaciones</span>
+
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <button id="logoutBtn" class="logout-button">
+
+                <span class="nav-icon">↪</span>
+
+                <span>Cerrar sesión</span>
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+
+
+        <!-- HEADER -->
+        <header class="topbar">
+
+            <div class="welcome">
+
+                <span class="welcome-label">
+                    GRUPO
+                </span>
+
+                <div class="group-title-row">
+
+                    <h1 id="groupName">
+                        Cargando...
+                    </h1>
+
+                    <button
+                        id="inviteMemberBtn"
+                        class="primary-button"
+                    >
+                        + Invitar miembro
+                    </button>
+
+                    <button
+                        id="registerPaymentBtn"
+                        class="primary-button"
+                    >
+                        + Registrar pago
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="user-info">
+
+                <div
+                    class="user-avatar"
+                    id="userAvatar"
+                >
+                    ?
+                </div>
+
+
+                <div class="user-data">
+
+                    <span id="userNameHeader">
+                        Usuario
+                    </span>
+
+                    <span id="userEmail">
+                        correo@ejemplo.com
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENIDO -->
+        <section class="content">
+
+
+            <!-- BALANCE -->
+            <div class="section-header">
+
+                <div>
+
+                    <span class="section-label">
+                        RESUMEN
+                    </span>
+
+                    <h2>
+                        Balance general
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="balance-card">
+
+                <span class="balance-label">
+                    Tu balance
+                </span>
+
+                <strong id="balanceGeneral">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+            <!-- DEUDAS -->
+            <div class="debts-section">
+
+
+                <!-- DEBES -->
+                <div class="debt-column">
+
+                    <div class="section-header">
+
+                        <div>
+
+                            <span class="section-label">
+                                PENDIENTES
+                            </span>
+
+                            <h2>
+                                Debes
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="debtsYouOwe"
+                        class="debt-list"
+                    >
+
+                        <div class="empty-state">
+
+                            <div class="loading-spinner"></div>
+
+                            <p>
+                                Cargando...
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TE DEBEN -->
+                <div class="debt-column">
+
+                    <div class="section-header">
+
+                        <div>
+
+                            <span class="section-label">
+                                PENDIENTES
+                            </span>
+
+                            <h2>
+                                Te deben
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="debtsTheyOwe"
+                        class="debt-list"
+                    >
+
+                        <div class="empty-state">
+
+                            <div class="loading-spinner"></div>
+
+                            <p>
+                                Cargando...
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- MOVIMIENTOS -->
+            <div class="section-header movements-header">
+
+                <div>
+
+                    <span class="section-label">
+                        ACTIVIDAD
+                    </span>
+
+                    <h2>
+                        Movimientos recientes
+                    </h2>
+
+                </div>
+
+                <button id="createMovementBtn" class="primary-button">
+                    <span>+</span>
+                    Agregar movimiento
+                </button>
+
+            </div>
+
+
+            <div
+                id="recentMovements"
+                class="movements-container"
+            >
+
+                <div class="empty-state">
+
+                    <div class="loading-spinner"></div>
+
+                    <p>
+                        Cargando movimientos...
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- MODAL CREAR MOVIMIENTO -->
+<div id="createMovementModal" class="modal-overlay hidden">
+
+    <div class="modal movement-modal">
+
+        <div class="modal-header">
+
+            <div>
+
+                <span class="section-label">
+                    NUEVA ACTIVIDAD
+                </span>
+
+                <h2>
+                    Agregar movimiento
+                </h2>
+
+            </div>
+
+            <button
+                id="closeMovementModalBtn"
+                class="close-button"
+                type="button"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="createMovementForm">
+
+            <!-- DESCRIPCIÓN -->
+
+            <div class="form-group">
+
+                <label for="movementDescription">
+                    Descripción
+                </label>
+
+                <input
+                    type="text"
+                    id="movementDescription"
+                    maxlength="255"
+                    placeholder="Ej. Cena"
+                    required
+                >
+
+            </div>
+
+
+            <!-- MONTO -->
+
+            <div class="form-group">
+
+                <label for="movementAmount">
+                    Monto total
+                </label>
+
+                <input
+                    type="number"
+                    id="movementAmount"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="0.00"
+                    required
+                >
+
+            </div>
+
+
+            <!-- PAGADOR -->
+
+            <div class="form-group">
+
+                <label for="movementPayer">
+                    ¿Quién pagó?
+                </label>
+
+                <select
+                    id="movementPayer"
+                    required
+                >
+
+                    <option value="">
+                        Selecciona un miembro
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- TIPO DE MOVIMIENTO -->
+            <div class="form-group">
+
+                <label for="movementType">
+                    Tipo de movimiento
+                </label>
+
+                <select id="movementType" disabled>
+
+                    <option value="GASTO" selected>
+                        Gasto
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- TIPO DE DIVISIÓN -->
+            <div class="form-group">
+
+                <label for="movementDivision">
+                    División
+                </label>
+
+                <select id="movementDivision" required>
+
+                    <option value="IGUAL">
+                        Dividir por partes iguales
+                    </option>
+
+                    <option value="PERSONALIZADA">
+                        División personalizada
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- PARTICIPANTES -->
+
+            <div class="form-group">
+
+                <label>
+                    Participantes
+                </label>
+
+                <div
+                    id="participantsContainer"
+                    class="participants-container"
+                >
+                    <!-- Se llena mediante JavaScript -->
+                </div>
+
+            </div>
+
+
+            <!-- ERROR -->
+
+            <div
+                id="createMovementError"
+                class="form-error hidden"
+            >
+            </div>
+
+
+            <!-- BOTONES -->
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    id="cancelMovementBtn"
+                    class="secondary-button"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Crear movimiento
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- MODAL INVITAR MIEMBRO -->
+<div id="inviteMemberModal" class="modal-overlay hidden">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div>
+
+                <span class="section-label">
+                    INVITACIÓN
+                </span>
+
+                <h2>
+                    Invitar miembro
+                </h2>
+
+            </div>
+
+            <button
+                type="button"
+                id="closeInviteModalBtn"
+                class="close-button"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="inviteMemberForm">
+
+            <div class="form-group">
+
+                <label for="memberEmail">
+                    Correo electrónico
+                </label>
+
+                <input
+                    type="email"
+                    id="memberEmail"
+                    name="email"
+                    placeholder="Ej. usuario@correo.com"
+                    required
+                >
+
+            </div>
+
+
+            <div
+                id="inviteMemberError"
+                class="form-error hidden"
+            >
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    id="cancelInviteModalBtn"
+                    class="secondary-button"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Enviar invitación
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- MODAL REGISTRAR PAGO -->
+<div id="registerPaymentModal" class="modal-overlay hidden">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div>
+
+                <span class="section-label">
+                    PAGO
+                </span>
+
+                <h2>
+                    Registrar pago
+                </h2>
+
+            </div>
+
+            <button
+                type="button"
+                id="closePaymentModalBtn"
+                class="close-button"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="registerPaymentForm">
+
+            <div class="form-group">
+
+                <label for="paymentDebt">
+                    Deuda
+                </label>
+
+                <select
+                    id="paymentDebt"
+                    required
+                >
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="paymentAmount">
+                    Monto
+                </label>
+
+                <input
+                    type="number"
+                    id="paymentAmount"
+                    min="0.01"
+                    step="0.01"
+                    required
+                >
+
+            </div>
+
+
+            <div
+                id="paymentError"
+                class="form-error hidden"
+            >
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    id="cancelPaymentModalBtn"
+                    class="secondary-button"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Registrar pago
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="../javascript/api.js"></script>
+<script src="../javascript/grupo-dashboard.js"></script>
+
+</body>
+
+</html>

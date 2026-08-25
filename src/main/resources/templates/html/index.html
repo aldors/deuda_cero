@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Deuda Cero</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Dosis:wght@200..800&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet" href="../css/auth.css">
+</head>
+
+<body>
+
+<main class="auth-container">
+
+    <!-- Panel izquierdo -->
+    <section class="auth-info">
+
+        <div class="brand">
+            <span class="brand-icon">$</span>
+            <span>Deuda Cero</span>
+        </div>
+
+        <div class="info-content">
+
+            <h1>
+                Divide gastos.
+                <span>Sin complicaciones.</span>
+            </h1>
+
+            <p>
+                Lleva el control de las deudas entre amigos,
+                divide gastos y mantén todo claro.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- Panel derecho -->
+    <section class="auth-form-container">
+
+        <!-- LOGIN -->
+        <div class="auth-form active" id="loginForm">
+
+            <div class="form-header">
+                <h2>Bienvenido</h2>
+                <p>Inicia sesión para continuar.</p>
+            </div>
+
+            <form id="formLogin">
+
+                <div class="input-group">
+                    <label for="loginEmail">Correo electrónico</label>
+
+                    <input
+                        type="email"
+                        id="loginEmail"
+                        name="email"
+                        placeholder="ejemplo@correo.com"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label for="loginPassword">Contraseña</label>
+
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        name="password"
+                        placeholder="Tu contraseña"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    Iniciar sesión
+                </button>
+
+            </form>
+
+            <div class="form-message" id="loginMessage"></div>
+
+            <div class="form-footer">
+                <p>
+                    ¿No tienes una cuenta?
+                    <button type="button" id="showRegister">
+                        Crear cuenta
+                    </button>
+                </p>
+
+                <!--
+                    <button type="button" id="logoutTest">
+                        Cerrar sesión
+                    </button>
+                -->
+            </div>
+
+        </div>
+
+
+        <!-- REGISTRO -->
+        <div class="auth-form" id="registerForm">
+
+            <div class="form-header">
+                <h2>Crear cuenta</h2>
+                <p>Comienza a controlar tus gastos.</p>
+            </div>
+
+            <form id="formRegister">
+
+                <div class="input-row">
+
+                    <div class="input-group">
+                        <label for="registerNombre">Nombre</label>
+
+                        <input
+                            type="text"
+                            id="registerNombre"
+                            name="nombre"
+                            placeholder="Aldo"
+                            required
+                        >
+                    </div>
+
+                    <div class="input-group">
+                        <label for="registerApellido">Apellido</label>
+
+                        <input
+                            type="text"
+                            id="registerApellido"
+                            name="apellido"
+                            placeholder="Ruiz"
+                            required
+                        >
+                    </div>
+
+                </div>
+
+                <div class="input-group">
+                    <label for="registerEmail">Correo electrónico</label>
+
+                    <input
+                        type="email"
+                        id="registerEmail"
+                        name="email"
+                        placeholder="ejemplo@correo.com"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label for="registerPassword">Contraseña</label>
+
+                    <input
+                        type="password"
+                        id="registerPassword"
+                        name="password"
+                        placeholder="Crea una contraseña"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    Crear cuenta
+                </button>
+
+            </form>
+
+            <div class="form-message" id="registerMessage"></div>
+
+            <div class="form-footer">
+                <p>
+                    ¿Ya tienes una cuenta?
+                    <button type="button" id="showLogin">
+                        Iniciar sesión
+                    </button>
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script src="../javascript/api.js"></script>
+<script src="../javascript/auth.js"></script>
+
+</body>
+</html>

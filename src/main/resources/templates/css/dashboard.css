@@ -1,0 +1,828 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --background: #f5f5f2;
+    --surface: #ffffff;
+    --surface-secondary: #f8f8f6;
+
+    --text-primary: #1f211f;
+    --text-secondary: #777a75;
+    --text-light: #a0a39d;
+
+    --border: #e8e8e3;
+
+    --accent: #1f211f;
+    --accent-hover: #353735;
+
+    --success: #3d7655;
+    --success-background: #edf6ef;
+
+    --danger: #a34d4d;
+    --danger-background: #faf0f0;
+
+    --shadow: 0 10px 30px rgba(30, 30, 30, 0.06);
+
+    --sidebar-width: 240px;
+}
+
+
+/* =========================
+   GENERAL
+========================= */
+
+body {
+    font-family: "Dosis", sans-serif;
+    background: var(--background);
+    color: var(--text-primary);
+    min-height: 100vh;
+}
+
+button,
+input,
+textarea {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+
+/* =========================
+   APP
+========================= */
+
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 28px 18px;
+
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+
+
+/* LOGO */
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 0 10px;
+    margin-bottom: 45px;
+
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-size: 20px;
+    font-weight: 650;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--accent);
+    color: white;
+
+    border-radius: 9px;
+
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-size: 17px;
+}
+
+
+/* NAVIGATION */
+
+.navigation {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.nav-item,
+.logout-button {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 11px 12px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: transparent;
+
+    color: var(--text-secondary);
+
+    font-size: 16px;
+
+    transition: 0.2s ease;
+}
+
+.nav-item:hover,
+.logout-button:hover {
+    background: var(--surface-secondary);
+    color: var(--text-primary);
+}
+
+.nav-item.active {
+    background: #eeeeeb;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.nav-icon {
+    width: 20px;
+
+    display: flex;
+    justify-content: center;
+
+    font-size: 18px;
+}
+
+.notification-badge {
+    margin-left: auto;
+
+    min-width: 20px;
+    height: 20px;
+
+    padding: 0 5px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 20px;
+
+    background: var(--accent);
+    color: white;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+.main-content {
+    margin-left: var(--sidebar-width);
+
+    width: calc(100% - var(--sidebar-width));
+
+    min-height: 100vh;
+}
+
+
+/* =========================
+   TOPBAR
+========================= */
+
+.topbar {
+    min-height: 105px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 28px 45px;
+
+    background: var(--surface);
+
+    border-bottom: 1px solid var(--border);
+}
+
+.welcome {
+    display: flex;
+    flex-direction: column;
+}
+
+.welcome-label {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.welcome h1 {
+    font-family: "Bricolage Grotesque", sans-serif;
+
+    font-size: 27px;
+    font-weight: 600;
+}
+
+
+/* USER */
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: var(--accent);
+    color: white;
+
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 600;
+}
+
+.user-data {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-data span:first-child {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.user-data span:last-child {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+
+/* =========================
+   CONTENT
+========================= */
+
+.content {
+    max-width: 1250px;
+    margin: 0 auto;
+
+    padding: 42px 45px 60px;
+}
+
+
+/* SECTION HEADER */
+
+.section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    margin-bottom: 22px;
+}
+
+.section-label {
+    display: block;
+
+    color: var(--text-light);
+
+    font-family: "Bricolage Grotesque", sans-serif;
+
+    font-size: 11px;
+    font-weight: 650;
+
+    letter-spacing: 1.5px;
+
+    margin-bottom: 5px;
+}
+
+.section-header h2 {
+    font-family: "Bricolage Grotesque", sans-serif;
+
+    font-size: 23px;
+    font-weight: 600;
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+.primary-button,
+.secondary-button {
+    border: none;
+    border-radius: 8px;
+
+    padding: 10px 16px;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    transition: 0.2s ease;
+}
+
+.primary-button {
+    background: var(--accent);
+    color: white;
+}
+
+.primary-button:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+.secondary-button {
+    background: #eeeeeb;
+    color: var(--text-primary);
+}
+
+.secondary-button:hover {
+    background: #e5e5e1;
+}
+
+
+/* =========================
+   GROUPS
+========================= */
+
+.groups-grid {
+    display: grid;
+
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+
+    gap: 16px;
+
+    min-height: 120px;
+}
+
+.group-card {
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: 13px;
+
+    padding: 22px;
+
+    cursor: pointer;
+
+    box-shadow: var(--shadow);
+
+    transition: 0.2s ease;
+}
+
+.group-card:hover {
+    transform: translateY(-3px);
+    border-color: #d7d7d1;
+}
+
+.group-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+}
+
+.group-icon {
+    width: 43px;
+    height: 43px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #eeeeeb;
+
+    border-radius: 10px;
+
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.group-arrow {
+    color: var(--text-light);
+    font-size: 20px;
+}
+
+.group-card h3 {
+    font-family: "Bricolage Grotesque", sans-serif;
+
+    font-size: 19px;
+    font-weight: 600;
+
+    margin-bottom: 6px;
+}
+
+.group-description {
+    color: var(--text-secondary);
+
+    font-size: 14px;
+
+    min-height: 21px;
+
+    margin-bottom: 15px;
+}
+
+.group-members {
+    color: var(--text-secondary);
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   EMPTY / LOADING
+========================= */
+
+.empty-state {
+    width: 100%;
+
+    min-height: 130px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    color: var(--text-secondary);
+
+    border: 1px dashed #d9d9d3;
+    border-radius: 12px;
+}
+
+.empty-icon {
+    font-size: 24px;
+}
+
+.loading-spinner {
+    width: 23px;
+    height: 23px;
+
+    border: 3px solid #e5e5e0;
+    border-top-color: var(--accent);
+
+    border-radius: 50%;
+
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* =========================
+   INVITATIONS
+========================= */
+
+.invitations-header {
+    margin-top: 48px;
+}
+
+.invitations-container {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+.invitation-card {
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: 12px;
+
+    padding: 18px 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    box-shadow: var(--shadow);
+}
+
+.invitation-info {
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.invitation-info strong {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-size: 16px;
+}
+
+.invitation-info span {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.invitation-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.accept-button,
+.reject-button {
+    border: none;
+
+    padding: 8px 13px;
+
+    border-radius: 7px;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.accept-button {
+    background: var(--success-background);
+    color: var(--success);
+}
+
+.reject-button {
+    background: var(--danger-background);
+    color: var(--danger);
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+.modal-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(20, 20, 20, 0.35);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    z-index: 100;
+}
+
+.modal {
+    width: 100%;
+    max-width: 450px;
+
+    background: var(--surface);
+
+    border-radius: 15px;
+
+    padding: 27px;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    margin-bottom: 28px;
+}
+
+.modal-header h2 {
+    font-family: "Bricolage Grotesque", sans-serif;
+
+    font-size: 23px;
+}
+
+.close-button {
+    width: 32px;
+    height: 32px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #eeeeeb;
+
+    font-size: 21px;
+
+    color: var(--text-secondary);
+}
+
+.close-button:hover {
+    background: #e5e5e1;
+}
+
+
+/* FORM */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.form-group label span {
+    color: var(--text-light);
+    font-weight: 400;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+
+    border: 1px solid var(--border);
+
+    border-radius: 8px;
+
+    background: var(--surface-secondary);
+
+    padding: 11px 12px;
+
+    outline: none;
+
+    font-size: 15px;
+
+    color: var(--text-primary);
+
+    transition: 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #b9b9b2;
+
+    background: white;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-error {
+    background: var(--danger-background);
+
+    color: var(--danger);
+
+    border-radius: 8px;
+
+    padding: 10px 12px;
+
+    margin-bottom: 18px;
+
+    font-size: 14px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 9px;
+
+    margin-top: 25px;
+}
+
+
+/* =========================
+   UTILITIES
+========================= */
+
+.hidden {
+    display: none !important;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 800px) {
+
+    .sidebar {
+        width: 70px;
+
+        padding: 25px 10px;
+    }
+
+    .logo {
+        justify-content: center;
+        padding: 0;
+    }
+
+    .logo span:last-child {
+        display: none;
+    }
+
+    .nav-item span:not(.nav-icon),
+    .logout-button span:not(.nav-icon) {
+        display: none;
+    }
+
+    .notification-badge {
+        position: absolute;
+        margin-left: 25px;
+    }
+
+    .nav-item,
+    .logout-button {
+        justify-content: center;
+    }
+
+    .main-content {
+        margin-left: 70px;
+        width: calc(100% - 70px);
+    }
+
+    .topbar {
+        padding: 22px;
+    }
+
+    .content {
+        padding: 30px 22px;
+    }
+
+    .user-data {
+        display: none;
+    }
+}
+
+
+@media (max-width: 550px) {
+
+    .topbar {
+        align-items: flex-start;
+    }
+
+    .welcome h1 {
+        font-size: 22px;
+    }
+
+    .section-header {
+        align-items: flex-start;
+        gap: 15px;
+        flex-direction: column;
+    }
+
+    .primary-button {
+        align-self: flex-start;
+    }
+
+    .invitation-card {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .invitation-actions {
+        width: 100%;
+    }
+
+    .accept-button,
+    .reject-button {
+        flex: 1;
+    }
+}
