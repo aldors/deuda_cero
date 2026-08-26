@@ -23,6 +23,7 @@ import com.aldo.deuda_cero.entity.Movimiento;
 import com.aldo.deuda_cero.entity.ParticipacionMovimiento;
 import com.aldo.deuda_cero.entity.enums.TipoDivision;
 import com.aldo.deuda_cero.exception.MiembroPagadorNoPerteneceAlGrupoException;
+import com.aldo.deuda_cero.exception.MovimientoNoEncontradoException;
 import com.aldo.deuda_cero.exception.ParticipantesNoPertenecenAlGrupoException;
 import com.aldo.deuda_cero.exception.SumaDeMontosNoCoincideConMontoTotalException;
 import com.aldo.deuda_cero.mapper.MovimientoMapper;
@@ -86,7 +87,7 @@ public class MovimientoServiceImpl implements MovimientoService{
         groupPermissionService.obtenerMiembroActual(grupoId);
 
         Movimiento movimiento = movimientoRepository.findByIdAndGrupoId(movimientoId, grupoId)
-                .orElseThrow(() -> new RuntimeException("Movimiento no encontrado"));
+                .orElseThrow(() -> new MovimientoNoEncontradoException());
 
 
         return MovimientoMapper.toDetalleResponse(movimiento);

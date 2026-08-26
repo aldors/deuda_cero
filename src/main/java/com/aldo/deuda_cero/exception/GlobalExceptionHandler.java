@@ -352,4 +352,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(apiError);
     }
 
+    @ExceptionHandler(MovimientoNoEncontradoException.class)
+    public ResponseEntity<ApiError> handleMovimientoNoEncontrado(MovimientoNoEncontradoException ex){
+
+        ApiError apiError = new ApiError(
+            HttpStatus.BAD_REQUEST.value(),
+            "Movimiento no encontrado",
+            List.of(ex.getMessage())
+        );
+
+        return ResponseEntity.badRequest().body(apiError);
+    }
+
 }
