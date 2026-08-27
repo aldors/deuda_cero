@@ -35,7 +35,6 @@ import com.aldo.deuda_cero.exception.InvitacionATiMismoException;
 import com.aldo.deuda_cero.exception.InvitacionNoEncontrada;
 import com.aldo.deuda_cero.exception.InvitacionPendienteException;
 import com.aldo.deuda_cero.exception.InvitacionRespondidaException;
-import com.aldo.deuda_cero.exception.MiembroPagadorNoPerteneceAlGrupoException;
 import com.aldo.deuda_cero.exception.NoEsTuInvitacionException;
 import com.aldo.deuda_cero.exception.UsuarioNoEncontradoException;
 import com.aldo.deuda_cero.exception.UsuarioPerteneceAlGrupoException;
