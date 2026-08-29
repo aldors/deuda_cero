@@ -11,12 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.aldo.deuda_cero.dto.pagos.PagoResponse;
 import com.aldo.deuda_cero.dto.grupo.GrupoRequest;
 import com.aldo.deuda_cero.dto.grupo.GrupoResponse;
 import com.aldo.deuda_cero.dto.grupo.MiembrosResponse;
 import com.aldo.deuda_cero.service.interfaces.GrupoService;
-import com.aldo.deuda_cero.service.interfaces.PagoDeudaService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 public class GrupoController {
 
     private final GrupoService grupoService;
-    private final PagoDeudaService pagoDeudaService;
     
     @PostMapping("/crear")
     public ResponseEntity<GrupoResponse> crearGrupo(@Valid @RequestBody GrupoRequest grupoRequest){
@@ -37,12 +34,6 @@ public class GrupoController {
     @GetMapping("/grupos")
     public ResponseEntity<List<GrupoResponse>> obtenerMisGrupos(){
         return ResponseEntity.ok(grupoService.obtenerMisGrupos());
-    }
-
-    // No se por que no va dentro del controllador de pagoDeudaController
-    @GetMapping("/{grupoId}/pagos")
-    public ResponseEntity<List<PagoResponse>> obtenerPagos(@PathVariable Long grupoId){
-        return ResponseEntity.ok(pagoDeudaService.obtenerPagos(grupoId));
     }
 
     //Este si es de este controller
