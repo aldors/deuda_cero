@@ -25,7 +25,6 @@ import com.aldo.deuda_cero.dto.grupo.MiembrosResponse;
 import com.aldo.deuda_cero.security.CustomUserDetailsService;
 import com.aldo.deuda_cero.security.JwtService;
 import com.aldo.deuda_cero.service.interfaces.GrupoService;
-import com.aldo.deuda_cero.service.interfaces.PagoDeudaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(GrupoController.class)
@@ -44,9 +43,6 @@ public class GrupoControllerTest {
 
     @MockitoBean
     private CustomUserDetailsService customUserDetailsService;
-
-    @MockitoBean
-    private PagoDeudaService pagoDeudaService;
 
     @Test
     @WithMockUser
