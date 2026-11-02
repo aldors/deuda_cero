@@ -3,6 +3,7 @@ package com.aldo.deuda_cero.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,8 @@ public class BalanceController {
 
     private final BalanceService balanceService;
     
-    @GetMapping("/{grupoId}/balance")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{grupoId}")
     public ResponseEntity<List<BalanceMiembroResponse>> obtenerBalance(@PathVariable Long grupoId){
         return ResponseEntity.ok(balanceService.obtenerBalance(grupoId));
     }

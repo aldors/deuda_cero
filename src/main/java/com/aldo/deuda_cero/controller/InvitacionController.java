@@ -3,6 +3,7 @@ package com.aldo.deuda_cero.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,22 +27,26 @@ public class InvitacionController {
 
     private final InvitacionService invitacionService;
     
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/invitar/{grupoId}")
     public ResponseEntity<InvitacionResponse> invitarUsuarios(@PathVariable Long grupoId, @Valid @RequestBody InvitarMiembrosRequest invitarMiembrosRequest){
         return ResponseEntity.ok(invitacionService.invitarUsuarios(grupoId, invitarMiembrosRequest));
     }
 
-    @GetMapping("/invitaciones")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping
     public ResponseEntity<List<InvitacionesPendientesResponse>> obtenerInvitaciones(){
         return ResponseEntity.ok(invitacionService.obtenerInvitaciones());
     }
 
-    @PostMapping("/invitaciones/{invitacionId}/aceptar")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{invitacionId}/aceptar")
     public ResponseEntity<AceptarInvitacionResponse> aceptarInvitacion(@PathVariable Long invitacionId){
         return ResponseEntity.ok(invitacionService.aceptarInvitacion(invitacionId));
     }
 
-    @PostMapping("/invitaciones/{invitacionId}/rechazar")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{invitacionId}/rechazar")
     public ResponseEntity<AceptarInvitacionResponse> rechazarInvitacion(@PathVariable Long invitacionId){
         return ResponseEntity.ok(invitacionService.rechazarInvitacion(invitacionId));
     }

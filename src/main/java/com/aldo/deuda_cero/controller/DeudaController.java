@@ -3,6 +3,7 @@ package com.aldo.deuda_cero.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,16 +21,19 @@ public class DeudaController {
 
     private final DeudaService deudaService;
     
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{grupoId}/deudas")
     public ResponseEntity<List<DeudaResponse>> obtenerDeudas(@PathVariable Long grupoId){
         return ResponseEntity.ok(deudaService.obtenerDeudas(grupoId));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{grupoId}/deudas/pendientes")
     public ResponseEntity<List<DeudaResponse>> obtenerDeudasPendientes(@PathVariable Long grupoId){
         return ResponseEntity.ok(deudaService.obtenerDeudasPendientes(grupoId));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{grupoId}/deudas/{deudaId}")
     public ResponseEntity<DeudaResponse> obtenerDeudasPorId(@PathVariable Long grupoId, @PathVariable Long deudaId){
         return ResponseEntity.ok(deudaService.obtenerDeudaPorId(grupoId, deudaId));

@@ -4,6 +4,7 @@ package com.aldo.deuda_cero.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,19 +28,22 @@ public class MovimientoController {
 
     private final MovimientoService movimientoService;
     
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/crear/{grupoId}")
     public ResponseEntity<MovimientoResponse> crearMovimiento(@PathVariable Long grupoId, @Valid @RequestBody CrearMovimientoRequest crearMovimientoRequest){
         return ResponseEntity.ok(movimientoService.crearMovimiento(grupoId, crearMovimientoRequest));
     }
 
-    //consultar movimientos del grupo: GET /grupos/{id}/movimientos
-    @GetMapping("/{grupoId}/movimientos")
+    //consultar movimientos del grupo: GET /movimientos/{grupoId}
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{grupoId}")
     public ResponseEntity<List<MovimientoResumenResponse>> obtenerMovimientos(@PathVariable Long grupoId){
         return ResponseEntity.ok(movimientoService.obtenerMovimientos(grupoId));
     }
 
-    //consultar detalles de un movimiento: GET /movimientos/{id}
-    @GetMapping("/grupos/{grupoId}/movimientos/{movimientoId}")
+    //consultar detalles de un movimiento: GET /movimientos/{grupoId}/{movimientoId}
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{grupoId}/{movimientoId}")
     public ResponseEntity<MovimientoDetalleResponse> obtenerDetalle(@PathVariable Long grupoId, @PathVariable Long movimientoId){
         return ResponseEntity.ok(movimientoService.obtenerDetalleMovimiento(grupoId, movimientoId)
         );

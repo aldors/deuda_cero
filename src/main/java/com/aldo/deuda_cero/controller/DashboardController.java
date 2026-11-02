@@ -1,6 +1,7 @@
 package com.aldo.deuda_cero.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
     
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{grupoId}/dashboard")
     public ResponseEntity<DashboardResponse> obtenerDashboard(@PathVariable Long grupoId){
         return ResponseEntity.ok(dashboardService.obtenerDashboard(grupoId));

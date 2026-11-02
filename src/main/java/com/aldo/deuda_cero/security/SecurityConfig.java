@@ -38,12 +38,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/grupos/crear").hasRole("USER")
-                        .requestMatchers("/auth/registro", "/auth/login", "/auth/refresh-token", "/auth/logout").permitAll()
-                        .requestMatchers("/auth/usuarios/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/auth/admins/**").hasRole("ADMIN")
-                        //.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .anyRequest().authenticated()
+                    .requestMatchers("/auth/registro", "/auth/login", "/auth/refresh-token").permitAll()
+                    .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)

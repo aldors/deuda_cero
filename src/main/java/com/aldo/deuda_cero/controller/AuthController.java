@@ -2,6 +2,7 @@ package com.aldo.deuda_cero.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,25 +43,16 @@ public class AuthController {
         return ResponseEntity.ok(authService.refreshToken(refreshTokenRequest));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestBody LogoutRequest LogoutRequest){
         return ResponseEntity.ok(authService.logout(LogoutRequest));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
     public ResponseEntity<MeResponse> me(){
         return ResponseEntity.ok(authService.me());
     }
 
-    
-    //PRUEBAS DE ENDPOINTS PROTEGIDOS PARA USUARIOS Y ADMINS
-    @GetMapping("/usuarios")
-    public String usuarios(){
-        return "ERES UN USUARIO AUTENTICADO";
-    }
-    
-    @GetMapping("/admins")
-    public String admins(){
-        return "ERES UN USUARIO AUTENTICADO Y ADEMAS ERES ADMINISTRADOR";
-    }
 }

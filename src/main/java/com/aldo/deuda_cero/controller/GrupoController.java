@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,17 +27,20 @@ public class GrupoController {
 
     private final GrupoService grupoService;
     
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/crear")
     public ResponseEntity<GrupoResponse> crearGrupo(@Valid @RequestBody GrupoRequest grupoRequest){
         return ResponseEntity.status(HttpStatus.CREATED).body(grupoService.crearGrupo(grupoRequest));
     }
 
-    @GetMapping("/grupos")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping
     public ResponseEntity<List<GrupoResponse>> obtenerMisGrupos(){
         return ResponseEntity.ok(grupoService.obtenerMisGrupos());
     }
 
     //Este si es de este controller
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{grupoId}/miembros")
     public ResponseEntity<List<MiembrosResponse>> obtenerMiembros(@PathVariable Long grupoId){
         return ResponseEntity.ok(grupoService.obtenerMiembros(grupoId));
