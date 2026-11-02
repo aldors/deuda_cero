@@ -78,12 +78,17 @@ public class AuthServiceImpl implements AuthService{
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
 
+        Usuario usuario = usuarioRepository.findByEmail(loginRequest.getEmail())
+            .orElseThrow(() -> new UsuarioNoEncontradoException());
+        
+        refreshTokenResporitory.deleteByUsuario(usuario);
+
         String accessToken = jwtService.generateAccessToken(userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
 
         RefreshToken refreshTokenEntity = RefreshToken.builder()
             .token(refreshToken)
-            .usuario(usuarioRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new UsuarioNoEncontradoException()))
+            .usuario(usuario)
             .expirationDate(LocalDateTime.now().plusSeconds(jwtExpirationRefreshToken / 1000))
             .build();
 
