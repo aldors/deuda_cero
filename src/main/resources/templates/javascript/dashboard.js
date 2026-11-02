@@ -98,7 +98,7 @@ async function cerrarSesion() {
 
 async function obtenerMisGrupos() {
 
-    const response = await peticionAutenticada("/grupos/grupos");
+    const response = await peticionAutenticada("/grupos");
 
     if (!response.ok) {
         throw new Error("No se pudieron obtener los grupos");
@@ -110,7 +110,7 @@ async function obtenerMisGrupos() {
 async function obtenerInvitaciones() {
 
     const response = await peticionAutenticada(
-        "/invitaciones/invitaciones"
+        "/invitaciones"
     );
 
     if (!response.ok) {
@@ -401,7 +401,7 @@ async function aceptarInvitacion(invitacionId) {
     try {
 
         const response = await peticionAutenticada(
-            `/invitaciones/invitaciones/${invitacionId}/aceptar`,
+            `/invitaciones/${invitacionId}/aceptar`,
             {
                 method: "POST"
             }
@@ -456,7 +456,7 @@ async function rechazarInvitacion(invitacionId) {
     try {
 
         const response = await peticionAutenticada(
-            `/invitaciones/invitaciones/${invitacionId}/rechazar`,
+            `/invitaciones/${invitacionId}/rechazar`,
             {
                 method: "POST"
             }
