@@ -2,6 +2,7 @@ package com.aldo.deuda_cero.service.implementaciones;
 
 import java.time.LocalDateTime;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -46,6 +47,9 @@ public class AuthServiceImpl implements AuthService{
     private final RefreshTokenResporitory refreshTokenResporitory;
     private final CurrentUserService currentUserService;
 
+    @Value("${jwt.expirationRefreshToken}")
+    private long jwtExpirationRefreshToken;
+
     @Override
     public RegistroResponse registro(RegistroRequest registroRequest) {
 
@@ -80,7 +84,7 @@ public class AuthServiceImpl implements AuthService{
         RefreshToken refreshTokenEntity = RefreshToken.builder()
             .token(refreshToken)
             .usuario(usuarioRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new UsuarioNoEncontradoException()))
-            .expirationDate(LocalDateTime.now().plusDays(1))
+            .expirationDate(LocalDateTime.now().plusSeconds(jwtExpirationRefreshToken / 1000))
             .build();
 
         refreshTokenResporitory.save(refreshTokenEntity);
