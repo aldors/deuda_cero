@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -33,6 +35,32 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.badRequest().body(apiError);
+    }
+
+    // Cuenta desactivada
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ApiError> handleDisabled(DisabledException ex) {
+
+        ApiError apiError = new ApiError(
+                HttpStatus.FORBIDDEN.value(),
+                "Cuenta desactivada",
+                List.of(ex.getMessage())
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(apiError);
+    }
+
+    // Cuenta bloqueada
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<ApiError> handleLocked(LockedException ex) {
+
+        ApiError apiError = new ApiError(
+                HttpStatus.FORBIDDEN.value(),
+                "Cuenta bloqueada",
+                List.of(ex.getMessage())
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(apiError);
     }
     
     // Para errores de autenticación, como credenciales incorrectas
