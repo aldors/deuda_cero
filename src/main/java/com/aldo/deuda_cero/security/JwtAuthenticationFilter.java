@@ -9,6 +9,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.aldo.deuda_cero.repository.RefreshTokenResporitory;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final RefreshTokenResporitory refreshTokenRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -43,12 +46,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UserDetails user = userDetailsService.loadUserByUsername(email);
 
             if (jwtService.isValid(token, user)) {
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                
+                if (!user.isEnabled()) {
+                    refreshTokenRepository.deleteByUsuario_Email(user.getUsername());
+                } else {
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 
-                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+
+                }
             }
         }
 

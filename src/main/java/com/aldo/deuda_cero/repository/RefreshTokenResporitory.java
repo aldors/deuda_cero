@@ -15,4 +15,7 @@ public interface RefreshTokenResporitory extends JpaRepository<RefreshToken, Lon
 
     @Transactional
     void deleteByUsuario(Usuario usuario);
+
+    @Transactional
+    void deleteByUsuario_Email(String email);
 }
