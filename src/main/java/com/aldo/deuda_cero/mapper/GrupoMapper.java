@@ -1,7 +1,5 @@
 package com.aldo.deuda_cero.mapper;
 
-import java.time.LocalDateTime;
-
 import org.springframework.stereotype.Component;
 
 import com.aldo.deuda_cero.dto.grupo.GrupoRequest;
@@ -17,7 +15,6 @@ public class GrupoMapper {
         return Grupo.builder()
                 .nombre(grupoRequest.getNombre())
                 .descripcion(grupoRequest.getDescripcion())
-                .fechaCreacion(LocalDateTime.now())
                 .build();
     }
 

@@ -2,9 +2,6 @@ package com.aldo.deuda_cero.entity;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import com.aldo.deuda_cero.entity.enums.Role;
 
 import jakarta.persistence.Column;
@@ -14,6 +11,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,14 +45,34 @@ public class Usuario {
     @Column(nullable = false)
     private String password;
 
-    private Boolean activo = true;
+    private Boolean activo;
 
-    @CreationTimestamp
     private LocalDateTime fechaCreacion;
 
-    @UpdateTimestamp
     private LocalDateTime fechaActualizacion;
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @PrePersist
+    public void prePersist() {
+
+        LocalDateTime ahora = LocalDateTime.now();
+
+        this.fechaCreacion = ahora;
+        this.fechaActualizacion = ahora;
+
+        if (this.activo == null) {
+            this.activo = true;
+        }
+
+        if (this.role == null) {
+            this.role = Role.USER;
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.fechaActualizacion = LocalDateTime.now();
+    }
 }

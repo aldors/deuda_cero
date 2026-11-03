@@ -19,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -75,4 +76,17 @@ public class Movimiento {
         orphanRemoval = true 
     )
     private List<ParticipacionMovimiento> participaciones;
+
+    @PrePersist
+    public void prePersist() {
+        LocalDateTime ahora = LocalDateTime.now();
+
+        if (this.fechaCreacion == null) {
+            this.fechaCreacion = ahora;
+        }
+
+        if (this.fechaMovimiento == null) {
+            this.fechaMovimiento = ahora;
+        }
+    }
 }

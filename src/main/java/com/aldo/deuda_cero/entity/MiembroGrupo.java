@@ -17,6 +17,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -69,4 +70,13 @@ public class MiembroGrupo {
 
     @OneToMany(mappedBy = "miembroGrupo")
     private List<ParticipacionMovimiento> participaciones;
+
+    @PrePersist
+    public void prePersist() {
+        this.fechaIngreso = LocalDateTime.now();
+
+        if (this.estado == null) {
+            this.estado = EstadoMiembro.ACTIVO;
+        }
+    }
 }

@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 
 import com.aldo.deuda_cero.dto.auth.RegistroRequest;
 import com.aldo.deuda_cero.dto.auth.RegistroResponse;
-import com.aldo.deuda_cero.entity.enums.Role;
 import com.aldo.deuda_cero.entity.Usuario;
 
 @Component
@@ -17,8 +16,6 @@ public class ResgistroMapper {
                 .apellido(registroRequest.getApellido())
                 .email(registroRequest.getEmail())
                 .password(registroRequest.getPassword())
-                .role(Role.USER)
-                .activo(true)
                 .build();
     }
 

@@ -1,6 +1,5 @@
 package com.aldo.deuda_cero.service.implementaciones;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -14,7 +13,6 @@ import com.aldo.deuda_cero.entity.Invitacion;
 import com.aldo.deuda_cero.entity.MiembroGrupo;
 import com.aldo.deuda_cero.entity.Usuario;
 import com.aldo.deuda_cero.entity.enums.EstadoInvitacion;
-import com.aldo.deuda_cero.entity.enums.EstadoMiembro;
 import com.aldo.deuda_cero.entity.enums.RolGrupo;
 import com.aldo.deuda_cero.exception.InvitacionATiMismoException;
 import com.aldo.deuda_cero.exception.InvitacionNoEncontrada;
@@ -76,8 +74,6 @@ public class InvitacionServiceImpl implements InvitacionService{
             .grupo(administrador.getGrupo())
             .invitado(usuarioInvitado)
             .invitador(usuarioActual)
-            .estado(EstadoInvitacion.PENDIENTE)
-            .fechaEnvio(LocalDateTime.now())
             .build();
 
         invitacion = invitacionRepository.save(invitacion);
@@ -120,8 +116,6 @@ public class InvitacionServiceImpl implements InvitacionService{
                 .usuario(usuarioActual)
                 .grupo(invitacion.getGrupo())
                 .rol(RolGrupo.MIEMBRO)
-                .estado(EstadoMiembro.ACTIVO)
-                .fechaIngreso(LocalDateTime.now())
                 .build();
 
         miembroGrupoRepository.save(miembro);

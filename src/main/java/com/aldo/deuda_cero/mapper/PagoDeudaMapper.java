@@ -1,7 +1,5 @@
 package com.aldo.deuda_cero.mapper;
 
-import java.time.LocalDateTime;
-
 import org.springframework.stereotype.Component;
 
 import com.aldo.deuda_cero.dto.pagos.RegistrarPagoRequest;
@@ -17,8 +15,6 @@ public class PagoDeudaMapper {
         return PagoDeuda.builder()
                 .deuda(deuda)
                 .monto(registrarPagoRequest.getMonto())
-                .fechaPago(LocalDateTime.now())
-                .fechaCreacion(LocalDateTime.now())
                 .build();
     }
 

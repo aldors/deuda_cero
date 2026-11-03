@@ -1,7 +1,6 @@
 package com.aldo.deuda_cero.service.implementaciones;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -112,8 +111,6 @@ public class DeudaServiceImpl implements DeudaService{
 
         deuda.setMontoPendiente(deuda.getMontoPendiente().add(monto));
 
-        deuda.setFechaActualizacion(LocalDateTime.now());
-
         deudaRepository.save(deuda);
     }
 
@@ -125,9 +122,6 @@ public class DeudaServiceImpl implements DeudaService{
                 .acreedor(acreedor)
                 .montoOriginal(monto)
                 .montoPendiente(monto)
-                .estado(EstadoDeuda.PENDIENTE)
-                .fechaCreacion(LocalDateTime.now())
-                .fechaActualizacion(LocalDateTime.now())
                 .build();
 
         deudaRepository.save(deuda);
@@ -143,8 +137,6 @@ public class DeudaServiceImpl implements DeudaService{
 
             deudaInversa.setMontoPendiente(montoPendiente.subtract(monto));
 
-            deudaInversa.setFechaActualizacion(LocalDateTime.now());
-
             deudaRepository.save(deudaInversa);
 
             return;
@@ -156,8 +148,6 @@ public class DeudaServiceImpl implements DeudaService{
 
             deudaInversa.setEstado(EstadoDeuda.SALDADA);
 
-            deudaInversa.setFechaActualizacion(LocalDateTime.now());
-
             deudaRepository.save(deudaInversa);
 
             return;
@@ -168,8 +158,6 @@ public class DeudaServiceImpl implements DeudaService{
         deudaInversa.setMontoPendiente(BigDecimal.ZERO);
 
         deudaInversa.setEstado(EstadoDeuda.SALDADA);
-
-        deudaInversa.setFechaActualizacion(LocalDateTime.now());
 
         deudaRepository.save(deudaInversa);
 

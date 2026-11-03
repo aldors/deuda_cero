@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -58,6 +59,20 @@ public class PagoDeuda {
     private LocalDateTime fechaPago;
 
     private LocalDateTime fechaCreacion;
+
+    @PrePersist
+    public void prePersist() {
+
+        LocalDateTime ahora = LocalDateTime.now();
+
+        if (this.fechaPago == null) {
+            this.fechaPago = ahora;
+        }
+
+        if (this.fechaCreacion == null) {
+            this.fechaCreacion = ahora;
+        }
+    }
 }
 
 /*

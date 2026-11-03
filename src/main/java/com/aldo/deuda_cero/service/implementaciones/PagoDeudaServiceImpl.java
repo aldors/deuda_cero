@@ -1,7 +1,6 @@
 package com.aldo.deuda_cero.service.implementaciones;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -95,8 +94,6 @@ public class PagoDeudaServiceImpl implements PagoDeudaService{
         if(nuevoMontoPendiente.compareTo(BigDecimal.ZERO) == 0){
             deuda.setEstado(EstadoDeuda.SALDADA);
         }
-
-        deuda.setFechaActualizacion(LocalDateTime.now());
 
         deudaRepository.save(deuda);
 

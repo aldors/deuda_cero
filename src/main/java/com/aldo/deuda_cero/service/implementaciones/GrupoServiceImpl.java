@@ -1,6 +1,5 @@
 package com.aldo.deuda_cero.service.implementaciones;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -45,8 +44,6 @@ public class GrupoServiceImpl implements GrupoService{
             .usuario(usuario)
             .grupo(grupo)
             .rol(RolGrupo.AMDIN)
-            .estado(EstadoMiembro.ACTIVO)
-            .fechaIngreso(LocalDateTime.now())
             .build();
 
         miembroGrupoRepository.save(miembroGrupo);

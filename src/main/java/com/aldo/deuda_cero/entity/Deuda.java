@@ -15,6 +15,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,4 +62,25 @@ public class Deuda {
     private LocalDateTime fechaCreacion;
 
     private LocalDateTime fechaActualizacion;
+
+    @PrePersist
+    public void prePersist() {
+
+        LocalDateTime ahora = LocalDateTime.now();
+
+        if (this.fechaCreacion == null) {
+            this.fechaCreacion = ahora;
+        }
+
+        this.fechaActualizacion = ahora;
+
+        if (this.estado == null) {
+            this.estado = EstadoDeuda.PENDIENTE;
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.fechaActualizacion = LocalDateTime.now();
+    }
 }

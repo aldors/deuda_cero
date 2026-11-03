@@ -2,7 +2,6 @@ package com.aldo.deuda_cero.service.implementaciones;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -149,8 +148,6 @@ public class MovimientoServiceImpl implements MovimientoService{
         movimiento.setGrupo(registradoPor.getGrupo());
         movimiento.setRegistradoPor(registradoPor);
         movimiento.setPagador(pagador);
-        movimiento.setFechaMovimiento(LocalDateTime.now());
-        movimiento.setFechaCreacion(LocalDateTime.now());
         movimiento.setTipoDivision(crearMovimientoRequest.getTipoDivision());
 
         return movimientoRepository.save(movimiento);
