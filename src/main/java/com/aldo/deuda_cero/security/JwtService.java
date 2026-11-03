@@ -8,9 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-//import com.aldo.deuda_cero.entity.Usuario;
-//import com.aldo.deuda_cero.repository.UsuarioRepository;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -29,16 +26,13 @@ public class JwtService {
     @Value("${jwt.expirationRefreshToken}")
     private long jwtExpirationRefreshToken;
 
-    //private final UsuarioRepository usuarioRepository;
 
     public String generateAccessToken(UserDetails userDetails) {
-        //Usuario usuario = usuarioRepository.findByEmail(userDetails.getUsername()).orElseThrow();
 
         return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .claim("roles", userDetails.getAuthorities())
-                // Esto sirve para poder ver el nombre del usuario en la pestaña de perfil
-                //.claim("nombre", usuario.getNombre().toUpperCase())
+                .claim("type", "access")
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationAccessToken))
                 .signWith(getKey())
@@ -49,6 +43,7 @@ public class JwtService {
         return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .claim("roles", userDetails.getAuthorities())
+                .claim("type", "refresh")
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationRefreshToken))
                 .signWith(getKey())
@@ -57,6 +52,10 @@ public class JwtService {
 
     public String extractEmail(String token) {
         return extractClaims(token).getSubject();
+    }
+
+    public String extractTokenType(String token) {
+        return extractClaims(token).get("type", String.class);
     }
 
     public boolean isValid(String token, UserDetails userDetails) {
