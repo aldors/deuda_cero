@@ -19,6 +19,11 @@ public class CurrentUserService {
     public Usuario obtenerUsuarioActual(){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if(authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new RuntimeException("Usuario no autenticado");
+        }
+
         String email = authentication.getName();
 
         return usuarioRepository.findByEmail(email)
