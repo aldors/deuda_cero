@@ -79,7 +79,7 @@ public class GrupoControllerTest {
         when(grupoService.obtenerMisGrupos()).thenReturn(response);
 
         mockMvc.perform(
-            get("/grupos/grupos")
+            get("/grupos")
             .with(csrf())
         )
         .andExpect(status().isOk())

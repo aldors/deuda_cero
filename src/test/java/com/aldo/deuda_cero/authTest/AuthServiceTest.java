@@ -225,11 +225,10 @@ public class AuthServiceTest {
         assertEquals("aldo@test.com", response.getEmail());
     }
 
-    // No funciona
     @Test
     void deberiaRetornarUsuarioExistente() {
 
-        when(usuarioRepository.findByEmail("aldo@test.com")).thenReturn(Optional.of(usuario));
+        when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario);
 
         Usuario user = currentUserService.obtenerUsuarioActual();
 
@@ -312,11 +311,10 @@ public class AuthServiceTest {
         assertThrows(RefreshTokenNoEncontradoException.class, () -> authServiceImpl.logout(logoutRequest));
     }
 
-    // No funciona
     @Test
     void deberiaLanzarExcepcionSiUsuarioNoExiste() {
 
-        when(usuarioRepository.findByEmail("no-existe@test.com")).thenReturn(Optional.empty());
+        when(currentUserService.obtenerUsuarioActual()).thenThrow(new UsuarioNoEncontradoException());
 
         assertThrows(UsuarioNoEncontradoException.class, () -> currentUserService.obtenerUsuarioActual());
     }

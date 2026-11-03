@@ -50,7 +50,7 @@ public class BalanceControllerTest {
         when(balanceService.obtenerBalance(grupoId)).thenReturn(response);
 
         mockMvc.perform(
-            get("/balances/{grupoId}/balance", grupoId)
+            get("/balances/{grupoId}", grupoId)
             .with(csrf())
         )
         .andExpect(status().isOk())

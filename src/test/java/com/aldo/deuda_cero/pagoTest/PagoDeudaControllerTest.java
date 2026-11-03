@@ -80,7 +80,7 @@ public class PagoDeudaControllerTest {
         when(pagoDeudaService.obtenerPagos(grupoId)).thenReturn(response);
 
         mockMvc.perform(
-            get("/pagos/{grupoId}/pagos", grupoId)
+            get("/pagos/{grupoId}", grupoId)
             .with(csrf())
         )
         .andExpect(status().isOk())

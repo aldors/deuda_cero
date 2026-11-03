@@ -98,7 +98,7 @@ public class MovimientoControllerTest {
         when(movimientoService.obtenerMovimientos(grupoId)).thenReturn(response);
 
         mockMvc.perform(
-            get("/movimientos/{grupoId}/movimientos", grupoId)
+            get("/movimientos/{grupoId}", grupoId)
             .with(csrf())
         )
         .andExpect(status().isOk())
@@ -120,7 +120,7 @@ public class MovimientoControllerTest {
         when(movimientoService.obtenerDetalleMovimiento(1L, 1L)).thenReturn(response);
 
         mockMvc.perform(
-            get("/movimientos/grupos/{grupoId}/movimientos/{movimientoId}", grupoId, movimientoId)
+            get("/movimientos/{grupoId}/{movimientoId}", grupoId, movimientoId)
             .with(csrf())
         )
         .andExpect(status().isOk())

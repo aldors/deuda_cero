@@ -81,7 +81,7 @@ public class InvitacionControllerTest {
         when(invitacionService.obtenerInvitaciones()).thenReturn(response);
 
         mockMvc.perform(
-            get("/invitaciones/invitaciones")
+            get("/invitaciones")
             .with(csrf())
         )
         .andExpect(status().isOk())
@@ -100,7 +100,7 @@ public class InvitacionControllerTest {
         when(invitacionService.aceptarInvitacion(invitacionId)).thenReturn(response);
 
         mockMvc.perform(
-            post("/invitaciones/invitaciones/{invitacionId}/aceptar", invitacionId)
+            post("/invitaciones/{invitacionId}/aceptar", invitacionId)
             .with(csrf())
         )
         .andExpect(status().isOk())
@@ -119,7 +119,7 @@ public class InvitacionControllerTest {
         when(invitacionService.rechazarInvitacion(invitacionId)).thenReturn(response);
 
         mockMvc.perform(
-            post("/invitaciones/invitaciones/{invitacionId}/rechazar", invitacionId)
+            post("/invitaciones/{invitacionId}/rechazar", invitacionId)
             .with(csrf())
         )
         .andExpect(status().isOk())
