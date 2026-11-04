@@ -320,6 +320,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(apiError);
     }
 
+    @ExceptionHandler(MontoParticipanteInvalidoException.class)
+    public ResponseEntity<ApiError> handleMontoParticipanteInvalido(MontoParticipanteInvalidoException ex){
+
+        ApiError apiError = new ApiError(
+            HttpStatus.BAD_REQUEST.value(),
+            "Monto de participante inválido",
+            List.of(ex.getMessage())
+        );
+
+        return ResponseEntity.badRequest().body(apiError);
+    }
+
     @ExceptionHandler(GrupoNoEncontradoException.class)
     public ResponseEntity<ApiError> handleGrupoNoEncontrado(GrupoNoEncontradoException ex){
 

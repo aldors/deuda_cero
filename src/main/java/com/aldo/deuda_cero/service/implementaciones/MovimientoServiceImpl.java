@@ -22,6 +22,7 @@ import com.aldo.deuda_cero.entity.Movimiento;
 import com.aldo.deuda_cero.entity.ParticipacionMovimiento;
 import com.aldo.deuda_cero.entity.enums.TipoDivision;
 import com.aldo.deuda_cero.exception.MiembroPagadorNoPerteneceAlGrupoException;
+import com.aldo.deuda_cero.exception.MontoParticipanteInvalidoException;
 import com.aldo.deuda_cero.exception.MovimientoNoEncontradoException;
 import com.aldo.deuda_cero.exception.ParticipantesNoPertenecenAlGrupoException;
 import com.aldo.deuda_cero.exception.SumaDeMontosNoCoincideConMontoTotalException;
@@ -107,6 +108,9 @@ public class MovimientoServiceImpl implements MovimientoService{
                                 .getId()
                                 .equals(pagador.getId())
                 )
+                .filter(participacion -> participacion.getMontoCorrespondiente() != null
+                                && participacion.getMontoCorrespondiente().compareTo(BigDecimal.ZERO) > 0
+                )
                 .map(participacion -> new ImpactoDeudaResponse(
                                 participacion.getMiembroGrupo(),
                                 pagador,
@@ -157,11 +161,13 @@ public class MovimientoServiceImpl implements MovimientoService{
 
         // return montoTotal.divide(BigDecimal.valueOf(participantes), 2, RoundingMode.HALF_UP);
 
-        BigDecimal montoBase =  montoTotal.divide(BigDecimal.valueOf(participantes), 2, RoundingMode.DOWN); // HALF_UP
+        BigDecimal totalEnCentavos = montoTotal.setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal montoBase = totalEnCentavos.divide(BigDecimal.valueOf(participantes), 2, RoundingMode.DOWN); // HALF_UP
 
         BigDecimal sumaBase = montoBase.multiply(BigDecimal.valueOf(participantes));
 
-        BigDecimal diferencia  = montoTotal.subtract(sumaBase);
+        BigDecimal diferencia = totalEnCentavos.subtract(sumaBase);
 
         int centavosRestantes = diferencia.movePointRight(2).intValueExact();
 
@@ -184,9 +190,18 @@ public class MovimientoServiceImpl implements MovimientoService{
 
     private void validarMontosPersonalizados(CrearMovimientoRequest crearMovimientoRequest){
 
-        BigDecimal suma = crearMovimientoRequest.getParticipantes().stream()
-            .map(ParticipanteMovimientoRequest::getMonto)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal suma = BigDecimal.ZERO;
+
+        for (ParticipanteMovimientoRequest participante : crearMovimientoRequest.getParticipantes()) {
+
+            BigDecimal monto = participante.getMonto();
+
+            if (monto == null || monto.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new MontoParticipanteInvalidoException();
+            }
+
+            suma = suma.add(monto);
+        }
 
         if(suma.compareTo(crearMovimientoRequest.getMontoTotal()) != 0) {
             throw new SumaDeMontosNoCoincideConMontoTotalException();

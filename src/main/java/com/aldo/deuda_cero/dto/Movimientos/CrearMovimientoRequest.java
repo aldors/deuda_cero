@@ -6,6 +6,8 @@ import java.util.List;
 import com.aldo.deuda_cero.entity.enums.TipoDivision;
 import com.aldo.deuda_cero.entity.enums.TipoMovimiento;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -24,6 +26,7 @@ public class CrearMovimientoRequest {
 
     @NotNull(message = "El monto total es obligatorio")
     @Positive(message = "El monto debe ser mayor que cero")
+    @Digits(integer = 8, fraction = 2, message = "El monto total debe tener máximo 2 decimales")
     private BigDecimal montoTotal;
 
     @NotNull(message = "Debe indicar quien realizó el pago")
@@ -36,5 +39,6 @@ public class CrearMovimientoRequest {
     private TipoDivision tipoDivision;
 
     @NotEmpty(message = "Debe haber al menos un participante")
+    @Valid
     private List<ParticipanteMovimientoRequest> participantes;
 }
