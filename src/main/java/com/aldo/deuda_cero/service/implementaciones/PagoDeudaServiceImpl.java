@@ -55,7 +55,7 @@ public class PagoDeudaServiceImpl implements PagoDeudaService{
         // Este usuario sera automaticamente el PAGADOR
         Usuario usuarioActual = currentUserService.obtenerUsuarioActual();
 
-        MiembroGrupo pagador = miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuarioActual.getId(), grupoId)//
+        MiembroGrupo pagador = miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuarioActual.getId(), grupoId)//
             .orElseThrow(() -> new MiembroPagadorNoPerteneceAlGrupoException());
 
         if(registrarPagoRequest.getMonto() == null || registrarPagoRequest.getMonto().compareTo(BigDecimal.ZERO) <= 0){

@@ -22,14 +22,14 @@ public class GroupPermissionService {
 
         Usuario usuario = currentUserService.obtenerUsuarioActual();
 
-        return miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuario.getId(), grupoId)
+        return miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuario.getId(), grupoId)
                 .orElseThrow(() -> new NoPerteneceAlGrupoException());
     }
 
     //Es lo mismo que la de arriba pero para las invitaciones se hace para no llamar 2 veces a currentUserService.obtenerUsuarioActual();
     public MiembroGrupo obtenerMiembro(Long grupoId, Usuario usuario) {
 
-        return miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuario.getId(), grupoId)
+        return miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuario.getId(), grupoId)
                 .orElseThrow(() -> new NoPerteneceAlGrupoException());
     }
 
@@ -50,7 +50,7 @@ public class GroupPermissionService {
 
         Usuario usuario = currentUserService.obtenerUsuarioActual();
 
-        MiembroGrupo miembro = miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuario.getId(), grupoId)
+        MiembroGrupo miembro = miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuario.getId(), grupoId)
                 .orElseThrow(() -> new NoPerteneceAlGrupoException());
 
         if (miembro.getRol() != RolGrupo.AMDIN) {

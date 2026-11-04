@@ -122,7 +122,7 @@ public class MovimientoServiceImpl implements MovimientoService{
       
     private MiembroGrupo obtenerPagador(Long grupoId, Long usuarioId){
 
-        return miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuarioId, grupoId)
+        return miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuarioId, grupoId)
             .orElseThrow(() -> new MiembroPagadorNoPerteneceAlGrupoException());
     }
 
@@ -132,7 +132,7 @@ public class MovimientoServiceImpl implements MovimientoService{
             .map(ParticipanteMovimientoRequest::getUsuarioId)
             .toList();
 
-        List<MiembroGrupo> miembros = miembroGrupoRepository.findByGrupoIdAndUsuarioIdIn(grupoId, usuarioIds);
+        List<MiembroGrupo> miembros = miembroGrupoRepository.findActivosByGrupoIdAndUsuarioIdIn(grupoId, usuarioIds);
 
         if(miembros.size() != usuarioIds.size()) {
             throw new ParticipantesNoPertenecenAlGrupoException();
