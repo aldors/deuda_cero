@@ -1,20 +1,19 @@
 package com.aldo.deuda_cero.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.aldo.deuda_cero.dto.invitaciones.InvitacionesPendientesResponse;
 import com.aldo.deuda_cero.entity.Invitacion;
-import com.aldo.deuda_cero.entity.enums.EstadoInvitacion;
 
 public interface InvitacionRepository extends JpaRepository<Invitacion,Long> {
 
-    boolean existsByGrupo_IdAndInvitado_IdAndEstado(
+    Optional<Invitacion> findByGrupoIdAndInvitadoId(
             Long grupoId,
-            Long invitadoId,
-            EstadoInvitacion estado
+            Long invitadoId
     );
 
     @Query("""

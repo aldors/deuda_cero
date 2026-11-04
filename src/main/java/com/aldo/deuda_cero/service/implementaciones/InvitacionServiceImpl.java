@@ -1,6 +1,7 @@
 package com.aldo.deuda_cero.service.implementaciones;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +43,7 @@ public class InvitacionServiceImpl implements InvitacionService{
     private final InvitacionRepository invitacionRepository;
 
     @Override
+    @Transactional
     public InvitacionResponse invitarUsuarios(Long grupoId, InvitarMiembrosRequest invitarMiembrosRequest) {
         
         //MiembroGrupo administrador = groupPermissionService.obtenerAdministradorActual(grupoId);
@@ -63,8 +65,25 @@ public class InvitacionServiceImpl implements InvitacionService{
             throw new UsuarioPerteneceAlGrupoException();
         }
 
-        if(invitacionRepository.existsByGrupo_IdAndInvitado_IdAndEstado(grupoId, usuarioInvitado.getId(), EstadoInvitacion.PENDIENTE)){
-            throw new InvitacionPendienteException();
+        Optional<Invitacion> invitacionExistente = invitacionRepository.findByGrupoIdAndInvitadoId(
+                grupoId,
+                usuarioInvitado.getId()
+        );
+
+        if (invitacionExistente.isPresent()) {
+
+            Invitacion existente = invitacionExistente.get();
+
+            if (existente.getEstado() == EstadoInvitacion.PENDIENTE) {
+                throw new InvitacionPendienteException();
+            }
+
+            existente.setEstado(EstadoInvitacion.PENDIENTE);
+            existente.setInvitador(usuarioActual);
+
+            existente = invitacionRepository.save(existente);
+
+            return InvitacionMapper.toResponse(existente);
         }
 
         ///
