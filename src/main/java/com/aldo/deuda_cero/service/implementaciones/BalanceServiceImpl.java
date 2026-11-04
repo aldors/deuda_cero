@@ -17,6 +17,7 @@ import com.aldo.deuda_cero.mapper.BalanceMapper;
 import com.aldo.deuda_cero.repository.MiembroGrupoRepository;
 import com.aldo.deuda_cero.repository.MovimientoRepository;
 import com.aldo.deuda_cero.repository.ParticipacionMovimientoRepository;
+import com.aldo.deuda_cero.security.GroupPermissionService;
 import com.aldo.deuda_cero.service.interfaces.BalanceService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class BalanceServiceImpl implements BalanceService{
     private final MiembroGrupoRepository miembroGrupoRepository;
     private final ParticipacionMovimientoRepository participacionMovimientoRepository;
     private final MovimientoRepository movimientoRepository;
+    private final GroupPermissionService groupPermissionService;
 
     /* Esto no se actualiza cuando se SALDAN DEUDAS por medio de PAGOS,
        pero si cuando se SALDAN DEUDAS por medio de COMPENSASIONES
@@ -36,6 +38,8 @@ public class BalanceServiceImpl implements BalanceService{
 
     @Override
     public List<BalanceMiembroResponse> obtenerBalance(Long grupoId) {
+
+        groupPermissionService.obtenerMiembroActual(grupoId);
 
         List<MiembroGrupo> miembros = miembroGrupoRepository.findByGrupoIdAndEstado(grupoId, EstadoMiembro.ACTIVO);
 

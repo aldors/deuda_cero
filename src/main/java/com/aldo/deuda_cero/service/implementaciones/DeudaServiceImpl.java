@@ -17,6 +17,7 @@ import com.aldo.deuda_cero.exception.DeudaNoEncontradaException;
 import com.aldo.deuda_cero.exception.DeudaNoPerteneceAlGrupoException;
 import com.aldo.deuda_cero.mapper.DeudaMapper;
 import com.aldo.deuda_cero.repository.DeudaRepository;
+import com.aldo.deuda_cero.security.GroupPermissionService;
 import com.aldo.deuda_cero.service.interfaces.DeudaService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,10 +28,13 @@ import lombok.RequiredArgsConstructor;
 public class DeudaServiceImpl implements DeudaService{
     
     private final DeudaRepository deudaRepository;
+    private final GroupPermissionService groupPermissionService;
 
     @Override
     public List<DeudaResponse> obtenerDeudas(Long grupoId) {
         
+        groupPermissionService.obtenerMiembroActual(grupoId);
+
         List<Deuda> deudas = deudaRepository.findByGrupoId(grupoId);
         return DeudaMapper.toResponseList(deudas);
 
@@ -43,6 +47,8 @@ public class DeudaServiceImpl implements DeudaService{
     @Override
     public List<DeudaResponse> obtenerDeudasPendientes(Long grupoId) {
         
+        groupPermissionService.obtenerMiembroActual(grupoId);
+
         List<Deuda> deudas = deudaRepository.findByGrupoIdAndEstado(grupoId, EstadoDeuda.PENDIENTE);
 
         return DeudaMapper.toResponseList(deudas);
@@ -51,6 +57,8 @@ public class DeudaServiceImpl implements DeudaService{
     @Override
     public DeudaResponse obtenerDeudaPorId(Long grupoId, Long deudaId) {
         
+        groupPermissionService.obtenerMiembroActual(grupoId);
+
         Deuda deuda = deudaRepository.findById(deudaId)
             .orElseThrow(() -> new DeudaNoEncontradaException());
 
