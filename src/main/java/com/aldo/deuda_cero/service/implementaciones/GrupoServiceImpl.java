@@ -3,6 +3,7 @@ package com.aldo.deuda_cero.service.implementaciones;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.aldo.deuda_cero.dto.grupo.GrupoRequest;
 import com.aldo.deuda_cero.dto.grupo.GrupoResponse;
@@ -32,6 +33,7 @@ public class GrupoServiceImpl implements GrupoService{
     private final MiembroGrupoRepository miembroGrupoRepository;
 
     @Override
+    @Transactional
     public GrupoResponse crearGrupo(GrupoRequest grupoRequest) {
 
         Usuario usuario = currentUserService.obtenerUsuarioActual();
