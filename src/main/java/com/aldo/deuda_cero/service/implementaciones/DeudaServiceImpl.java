@@ -24,13 +24,13 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class DeudaServiceImpl implements DeudaService{
     
     private final DeudaRepository deudaRepository;
     private final GroupPermissionService groupPermissionService;
 
     @Override
+    @Transactional(readOnly = true)
     public List<DeudaResponse> obtenerDeudas(Long grupoId) {
         
         groupPermissionService.obtenerMiembroActual(grupoId);
@@ -45,6 +45,7 @@ public class DeudaServiceImpl implements DeudaService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<DeudaResponse> obtenerDeudasPendientes(Long grupoId) {
         
         groupPermissionService.obtenerMiembroActual(grupoId);
@@ -55,6 +56,7 @@ public class DeudaServiceImpl implements DeudaService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DeudaResponse obtenerDeudaPorId(Long grupoId, Long deudaId) {
         
         groupPermissionService.obtenerMiembroActual(grupoId);
@@ -70,6 +72,7 @@ public class DeudaServiceImpl implements DeudaService{
     }
 
     @Override
+    @Transactional
     public void procesarImpactos(Long grupoId, List<ImpactoDeudaResponse> impactos) {
 
         for (ImpactoDeudaResponse impacto : impactos) {
