@@ -32,6 +32,7 @@ import com.aldo.deuda_cero.entity.enums.Role;
 import com.aldo.deuda_cero.exception.DeudaNoEncontradaException;
 import com.aldo.deuda_cero.exception.DeudaNoPerteneceAlGrupoException;
 import com.aldo.deuda_cero.repository.DeudaRepository;
+import com.aldo.deuda_cero.security.GroupPermissionService;
 import com.aldo.deuda_cero.service.implementaciones.DeudaServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +40,9 @@ public class DeudaServideTest {
     
     @Mock
     private DeudaRepository deudaRepository;
+
+    @Mock
+    private GroupPermissionService groupPermissionService;
 
     @InjectMocks
     private DeudaServiceImpl deudaServiceImpl;

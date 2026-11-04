@@ -27,6 +27,7 @@ import com.aldo.deuda_cero.entity.enums.Role;
 import com.aldo.deuda_cero.repository.MiembroGrupoRepository;
 import com.aldo.deuda_cero.repository.MovimientoRepository;
 import com.aldo.deuda_cero.repository.ParticipacionMovimientoRepository;
+import com.aldo.deuda_cero.security.GroupPermissionService;
 import com.aldo.deuda_cero.service.implementaciones.BalanceServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,6 +41,9 @@ public class BalanceServiceTest {
 
     @Mock
     private MovimientoRepository movimientoRepository;
+
+    @Mock
+    private GroupPermissionService groupPermissionService;
 
     @InjectMocks
     private BalanceServiceImpl balanceServiceImpl;

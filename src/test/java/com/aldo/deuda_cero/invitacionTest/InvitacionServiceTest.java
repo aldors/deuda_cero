@@ -138,7 +138,7 @@ public class InvitacionServiceTest {
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario);
         when(usuarioRepository.findByEmail(invitarMiembrosRequest.getEmail())).thenReturn(Optional.of(usuarioInvitado));
         when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupo.getId())).thenReturn(Optional.empty());
-        when(invitacionRepository.existsByGrupo_IdAndInvitado_IdAndEstado(grupo.getId(), usuarioInvitado.getId(), EstadoInvitacion.PENDIENTE)).thenReturn(false);
+        when(invitacionRepository.findByGrupoIdAndInvitadoId(grupo.getId(), usuarioInvitado.getId())).thenReturn(Optional.empty());
         when(groupPermissionService.obtenerMiembro(grupo.getId(), usuario)).thenReturn(miembroGrupo);
         when(invitacionRepository.save(any(Invitacion.class))).thenReturn(invitacion);
 
@@ -252,9 +252,30 @@ public class InvitacionServiceTest {
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario);
         when(usuarioRepository.findByEmail(invitarMiembrosRequest.getEmail())).thenReturn(Optional.of(usuarioInvitado));
         when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupo.getId())).thenReturn(Optional.empty());
-        when(invitacionRepository.existsByGrupo_IdAndInvitado_IdAndEstado(grupo.getId(), usuarioInvitado.getId(), EstadoInvitacion.PENDIENTE)).thenReturn(true);
+        when(invitacionRepository.findByGrupoIdAndInvitadoId(grupo.getId(), usuarioInvitado.getId())).thenReturn(Optional.of(invitacion));
     
         assertThrows(InvitacionPendienteException.class, () -> invitacionServiceImpl.invitarUsuarios(grupo.getId(), invitarMiembrosRequest));
+    }
+
+    @Test
+    void deberiaReinvitarUsuarioDespuesDeRechazo(){
+
+        invitacion.setEstado(EstadoInvitacion.RECHAZADA);
+
+        doNothing().when(groupPermissionService).validarAdministrador(grupo.getId());
+        when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario);
+        when(usuarioRepository.findByEmail(invitarMiembrosRequest.getEmail())).thenReturn(Optional.of(usuarioInvitado));
+        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupo.getId())).thenReturn(Optional.empty());
+        when(invitacionRepository.findByGrupoIdAndInvitadoId(grupo.getId(), usuarioInvitado.getId())).thenReturn(Optional.of(invitacion));
+        when(invitacionRepository.save(any(Invitacion.class))).thenReturn(invitacion);
+
+        InvitacionResponse response = invitacionServiceImpl.invitarUsuarios(grupo.getId(), invitarMiembrosRequest);
+
+        assertNotNull(response);
+        assertEquals(EstadoInvitacion.PENDIENTE, invitacion.getEstado());
+        assertEquals(invitacion.getId(), response.getId());
+
+        verify(invitacionRepository).save(any(Invitacion.class));
     }
 
     @Test
