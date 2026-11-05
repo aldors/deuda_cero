@@ -16,6 +16,7 @@ import com.aldo.deuda_cero.entity.enums.EstadoMiembro;
 import com.aldo.deuda_cero.mapper.BalanceMapper;
 import com.aldo.deuda_cero.repository.MiembroGrupoRepository;
 import com.aldo.deuda_cero.repository.MovimientoRepository;
+import com.aldo.deuda_cero.repository.PagoDeudaRepository;
 import com.aldo.deuda_cero.repository.ParticipacionMovimientoRepository;
 import com.aldo.deuda_cero.security.GroupPermissionService;
 import com.aldo.deuda_cero.service.interfaces.BalanceService;
@@ -30,11 +31,8 @@ public class BalanceServiceImpl implements BalanceService{
     private final MiembroGrupoRepository miembroGrupoRepository;
     private final ParticipacionMovimientoRepository participacionMovimientoRepository;
     private final MovimientoRepository movimientoRepository;
+    private final PagoDeudaRepository pagoDeudaRepository;
     private final GroupPermissionService groupPermissionService;
-
-    /* Esto no se actualiza cuando se SALDAN DEUDAS por medio de PAGOS,
-       pero si cuando se SALDAN DEUDAS por medio de COMPENSASIONES
-    */
 
     @Override
     public List<BalanceMiembroResponse> obtenerBalance(Long grupoId) {
@@ -47,6 +45,10 @@ public class BalanceServiceImpl implements BalanceService{
 
         List<TotalConsumidoResponse> totalesConsumidos = participacionMovimientoRepository.obtenerTotalConsumidoPorMiembro(grupoId);
 
+        List<TotalPagadoResponse> pagosRealizados = pagoDeudaRepository.obtenerTotalPagadoEnDeudas(grupoId);
+
+        List<TotalConsumidoResponse> pagosRecibidos = pagoDeudaRepository.obtenerTotalRecibidoEnDeudas(grupoId);
+
         Map<Long, BigDecimal> pagadosPorMiembro = totalesPagados.stream()
                         .collect(Collectors.toMap(
                                 TotalPagadoResponse::getMiembroGrupoId,
@@ -54,6 +56,18 @@ public class BalanceServiceImpl implements BalanceService{
                         ));
         
         Map<Long, BigDecimal> consumidosPorMiembro = totalesConsumidos.stream()
+                        .collect(Collectors.toMap(
+                                TotalConsumidoResponse::getMiembroGrupoId,
+                                TotalConsumidoResponse::getGtotalConsumido
+                        ));
+
+        Map<Long, BigDecimal> pagosRealizadosPorMiembro = pagosRealizados.stream()
+                        .collect(Collectors.toMap(
+                                TotalPagadoResponse::getMiembroGrupoId,
+                                TotalPagadoResponse::getTotalPagado
+                        ));
+
+        Map<Long, BigDecimal> pagosRecibidosPorMiembro = pagosRecibidos.stream()
                         .collect(Collectors.toMap(
                                 TotalConsumidoResponse::getMiembroGrupoId,
                                 TotalConsumidoResponse::getGtotalConsumido
@@ -68,7 +82,12 @@ public class BalanceServiceImpl implements BalanceService{
 
                             BigDecimal totalConsumido = consumidosPorMiembro.getOrDefault(miembroId, BigDecimal.ZERO);
 
-                            return BalanceMapper.toResponse(miembro, totalPagado, totalConsumido);
+                            BigDecimal balance = totalPagado
+                                    .subtract(totalConsumido)
+                                    .add(pagosRealizadosPorMiembro.getOrDefault(miembroId, BigDecimal.ZERO))
+                                    .subtract(pagosRecibidosPorMiembro.getOrDefault(miembroId, BigDecimal.ZERO));
+
+                            return BalanceMapper.toResponse(miembro, totalPagado, totalConsumido, balance);
                         })
                         .toList();
     }

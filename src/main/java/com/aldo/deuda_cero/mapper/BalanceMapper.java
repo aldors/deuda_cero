@@ -10,9 +10,7 @@ import com.aldo.deuda_cero.entity.MiembroGrupo;
 @Component
 public class BalanceMapper {
 
-    public static BalanceMiembroResponse toResponse(MiembroGrupo miembroGrupo, BigDecimal totalPagado, BigDecimal totalConsumido){
-
-        BigDecimal balance = totalPagado.subtract(totalConsumido);
+    public static BalanceMiembroResponse toResponse(MiembroGrupo miembroGrupo, BigDecimal totalPagado, BigDecimal totalConsumido, BigDecimal balance){
 
         return new BalanceMiembroResponse(
             miembroGrupo.getUsuario().getId(),
