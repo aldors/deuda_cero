@@ -41,7 +41,7 @@ import com.aldo.deuda_cero.exception.RefreshTokenExpiradoException;
 import com.aldo.deuda_cero.exception.RefreshTokenNoEncontradoException;
 import com.aldo.deuda_cero.exception.RefreshTokenNoValidoException;
 import com.aldo.deuda_cero.exception.UsuarioNoEncontradoException;
-import com.aldo.deuda_cero.repository.RefreshTokenResporitory;
+import com.aldo.deuda_cero.repository.RefreshTokenRepository;
 import com.aldo.deuda_cero.repository.UsuarioRepository;
 import com.aldo.deuda_cero.security.CurrentUserService;
 import com.aldo.deuda_cero.security.JwtService;
@@ -66,7 +66,7 @@ public class AuthServiceTest {
     private AuthenticationManager authenticationManager;
 
     @Mock
-    private RefreshTokenResporitory refreshTokenResporitory;
+    private RefreshTokenRepository refreshTokenRepository;
 
     @Mock
     private CurrentUserService currentUserService;
@@ -159,7 +159,7 @@ public class AuthServiceTest {
 
         when(usuarioRepository.findByEmail(loginRequest.getEmail())).thenReturn(Optional.of(usuario));
 
-        when(refreshTokenResporitory.save(any(RefreshToken.class))).thenReturn(new RefreshToken());
+        when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(new RefreshToken());
 
         LoginResponse response = authServiceImpl.login(loginRequest);
 
@@ -167,17 +167,17 @@ public class AuthServiceTest {
         assertEquals("access-token", response.getAccessToken());
         assertEquals("refresh-token", response.getRefreshToken());
 
-        verify(refreshTokenResporitory).save(any(RefreshToken.class));
+        verify(refreshTokenRepository).save(any(RefreshToken.class));
     }
 
     @Test
     void deberiaHacerLogoutCorrectamente(){
 
-        when(refreshTokenResporitory.findByToken(logoutRequest.getRefreshToken())).thenReturn(Optional.of(new RefreshToken()));
+        when(refreshTokenRepository.findByToken(logoutRequest.getRefreshToken())).thenReturn(Optional.of(new RefreshToken()));
 
         authServiceImpl.logout(logoutRequest);
 
-        verify(refreshTokenResporitory).deleteByToken(logoutRequest.getRefreshToken());
+        verify(refreshTokenRepository).deleteByToken(logoutRequest.getRefreshToken());
         
     }
 
@@ -190,7 +190,7 @@ public class AuthServiceTest {
                 .expirationDate(LocalDateTime.now().plusDays(1))
                 .build();
 
-        when(refreshTokenResporitory.findByToken(refreshTokenRequest.getRefreshToken())).thenReturn(Optional.of(tokenEntity));
+        when(refreshTokenRepository.findByToken(refreshTokenRequest.getRefreshToken())).thenReturn(Optional.of(tokenEntity));
         
         UserDetails userDetails = org.springframework.security.core.userdetails.User
                 .withUsername(loginRequest.getEmail())
@@ -210,7 +210,7 @@ public class AuthServiceTest {
         assertEquals("access-token-nuevo", response.getAccessToken());
         assertEquals("refresh-token", response.getRefreshToken());
 
-        verify(refreshTokenResporitory).findByToken(refreshTokenRequest.getRefreshToken());
+        verify(refreshTokenRepository).findByToken(refreshTokenRequest.getRefreshToken());
     }
 
     @Test
@@ -257,7 +257,7 @@ public class AuthServiceTest {
     @Test 
     void deberiaLanzarExcepcionSiRefreshTokenNoEncontrado(){
 
-        when(refreshTokenResporitory.findByToken("refresh-token")).thenReturn(Optional.empty());
+        when(refreshTokenRepository.findByToken("refresh-token")).thenReturn(Optional.empty());
 
         assertThrows(RefreshTokenNoEncontradoException.class, () -> authServiceImpl.refreshToken(refreshTokenRequest));
     }
@@ -271,7 +271,7 @@ public class AuthServiceTest {
                 .expirationDate(LocalDateTime.now().minusDays(1))
                 .build();
         
-        when(refreshTokenResporitory.findByToken("refresh-token")).thenReturn(Optional.of(tokenEntity));
+        when(refreshTokenRepository.findByToken("refresh-token")).thenReturn(Optional.of(tokenEntity));
 
         assertThrows(RefreshTokenExpiradoException.class, () -> authServiceImpl.refreshToken(refreshTokenRequest));
 
@@ -286,7 +286,7 @@ public class AuthServiceTest {
                 .expirationDate(LocalDateTime.now().plusDays(1))
                 .build();
 
-        when(refreshTokenResporitory.findByToken("refresh-token")).thenReturn(Optional.of(tokenEntity));
+        when(refreshTokenRepository.findByToken("refresh-token")).thenReturn(Optional.of(tokenEntity));
         
         UserDetails userDetails = org.springframework.security.core.userdetails.User
                 .withUsername(loginRequest.getEmail())
@@ -306,7 +306,7 @@ public class AuthServiceTest {
     @Test 
     void deberiaLanzarExcepcionSiRefreshTokenNoEncontradoLogout(){
 
-        when(refreshTokenResporitory.findByToken("refresh-token")).thenReturn(Optional.empty());
+        when(refreshTokenRepository.findByToken("refresh-token")).thenReturn(Optional.empty());
 
         assertThrows(RefreshTokenNoEncontradoException.class, () -> authServiceImpl.logout(logoutRequest));
     }
