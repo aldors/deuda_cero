@@ -166,7 +166,7 @@ public class PagoDeudaTest {
 
         when(grupoRepository.findById(grupo.getId())).thenReturn(Optional.of(grupo));
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario1);
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupoDeudor));
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupoDeudor));
         when(deudaRepository.findById(registrarPagoRequest.getDeudaId())).thenReturn(Optional.of(deuda));
         when(pagoDeudaRepository.save(any(PagoDeuda.class))).thenReturn(pagoDeuda);
         when(deudaRepository.save(any(Deuda.class))).thenReturn(deuda);
@@ -186,7 +186,7 @@ public class PagoDeudaTest {
 
         when(grupoRepository.findById(grupo.getId())).thenReturn(Optional.of(grupo));
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario1);
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupoDeudor));
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupoDeudor));
         when(deudaRepository.findById(registrarPagoRequest.getDeudaId())).thenReturn(Optional.of(deuda));
         when(pagoDeudaRepository.save(any(PagoDeuda.class))).thenReturn(pagoDeuda);
         when(deudaRepository.save(any(Deuda.class))).thenReturn(deuda);
@@ -231,7 +231,7 @@ public class PagoDeudaTest {
         
         when(grupoRepository.findById(grupo.getId())).thenReturn(Optional.of(grupo));
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario1);
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.empty());
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.empty());
 
         assertThrows(MiembroPagadorNoPerteneceAlGrupoException.class, () -> pagoDeudaServiceImpl.registrarPago(grupo.getId(), registrarPagoRequest));
     }
@@ -244,7 +244,7 @@ public class PagoDeudaTest {
 
         when(grupoRepository.findById(grupo.getId())).thenReturn(Optional.of(grupo));
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario1);
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupoDeudor));
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupoDeudor));
 
         assertThrows(MontoAPagarDebeSerMayorQueCeroException.class, () -> pagoDeudaServiceImpl.registrarPago(grupo.getId(), registrarPagoRequest));
     }
@@ -254,7 +254,7 @@ public class PagoDeudaTest {
 
         when(grupoRepository.findById(grupo.getId())).thenReturn(Optional.of(grupo));
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario1);
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupoDeudor));
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupoDeudor));
         when(deudaRepository.findById(registrarPagoRequest.getDeudaId())).thenReturn(Optional.empty());
 
         assertThrows(DeudaNoEncontradaException.class, () -> pagoDeudaServiceImpl.registrarPago(grupo.getId(), registrarPagoRequest));
@@ -265,7 +265,7 @@ public class PagoDeudaTest {
 
         when(grupoRepository.findById(anyLong())).thenReturn(Optional.of(grupo));
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario1);
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(anyLong(), anyLong())).thenReturn(Optional.of(miembroGrupoDeudor));
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(anyLong(), anyLong())).thenReturn(Optional.of(miembroGrupoDeudor));
         when(deudaRepository.findById(registrarPagoRequest.getDeudaId())).thenReturn(Optional.of(deuda));
 
         assertThrows(DeudaNoPerteneceAlGrupoException.class, () -> pagoDeudaServiceImpl.registrarPago(10L, registrarPagoRequest));
@@ -281,7 +281,7 @@ public class PagoDeudaTest {
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario1);
 
         // miembroGrupoDeudor es usuario 1 con id 1L
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupoDeudor));
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupoDeudor));
         when(deudaRepository.findById(registrarPagoRequest.getDeudaId())).thenReturn(Optional.of(deuda));
 
         // Aquí 2L != 1L osea el id del deudor (usuario 2) es diferente al id del pagador (usuario 1)
@@ -295,7 +295,7 @@ public class PagoDeudaTest {
 
         when(grupoRepository.findById(grupo.getId())).thenReturn(Optional.of(grupo));
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario1);
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupoDeudor));
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupoDeudor));
         when(deudaRepository.findById(registrarPagoRequest.getDeudaId())).thenReturn(Optional.of(deuda));
 
         assertThrows(DeudaSaldadaException.class, () -> pagoDeudaServiceImpl.registrarPago(grupo.getId(), registrarPagoRequest));
@@ -309,7 +309,7 @@ public class PagoDeudaTest {
 
         when(grupoRepository.findById(grupo.getId())).thenReturn(Optional.of(grupo));
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario1);
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupoDeudor));
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuario1.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupoDeudor));
         when(deudaRepository.findById(registrarPagoRequest.getDeudaId())).thenReturn(Optional.of(deuda));
 
         assertThrows(PagoNoPuedeSuperarLaDeudaPendiente.class, () -> pagoDeudaServiceImpl.registrarPago(grupo.getId(), registrarPagoRequest));

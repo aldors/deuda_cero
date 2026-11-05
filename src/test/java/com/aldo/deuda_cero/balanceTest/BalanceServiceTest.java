@@ -26,6 +26,7 @@ import com.aldo.deuda_cero.entity.enums.RolGrupo;
 import com.aldo.deuda_cero.entity.enums.Role;
 import com.aldo.deuda_cero.repository.MiembroGrupoRepository;
 import com.aldo.deuda_cero.repository.MovimientoRepository;
+import com.aldo.deuda_cero.repository.PagoDeudaRepository;
 import com.aldo.deuda_cero.repository.ParticipacionMovimientoRepository;
 import com.aldo.deuda_cero.security.GroupPermissionService;
 import com.aldo.deuda_cero.service.implementaciones.BalanceServiceImpl;
@@ -41,6 +42,9 @@ public class BalanceServiceTest {
 
     @Mock
     private MovimientoRepository movimientoRepository;
+
+    @Mock
+    private PagoDeudaRepository pagoDeudaRepository;
 
     @Mock
     private GroupPermissionService groupPermissionService;
@@ -173,6 +177,58 @@ public class BalanceServiceTest {
         assertEquals(miembroGrupo.getUsuario().getNombre(), response.get(0).getNombre());
         assertEquals(miembroGrupo.getId(), response.get(0).getMiembroGrupoId());
         assertEquals(new BigDecimal(-200), response.get(0).getBalance());
+    }
+
+    @Test
+    void deberiaActualizarBalanceCuandoElMiembroRealizaUnPago(){
+
+        List<TotalPagadoResponse> totalPagado = List.of(
+            new TotalPagadoResponse(miembroGrupo.getId(), new BigDecimal(300))
+        );
+
+        List<TotalConsumidoResponse> totalConsumido = List.of(
+            new TotalConsumidoResponse(miembroGrupo.getId(), new BigDecimal(200))
+        );
+
+        List<TotalPagadoResponse> pagosRealizados = List.of(
+            new TotalPagadoResponse(miembroGrupo.getId(), new BigDecimal(50))
+        );
+
+        when(miembroGrupoRepository.findByGrupoIdAndEstado(grupo.getId(), EstadoMiembro.ACTIVO)).thenReturn(List.of(miembroGrupo));
+        when(movimientoRepository.obtenerTotalPagadoPorMiembro(grupo.getId())).thenReturn(totalPagado);
+        when(participacionMovimientoRepository.obtenerTotalConsumidoPorMiembro(grupo.getId())).thenReturn(totalConsumido);
+        when(pagoDeudaRepository.obtenerTotalPagadoEnDeudas(grupo.getId())).thenReturn(pagosRealizados);
+
+        List<BalanceMiembroResponse> response = balanceServiceImpl.obtenerBalance(grupo.getId());
+
+        assertNotNull(response);
+        assertEquals(new BigDecimal(150), response.get(0).getBalance());
+    }
+
+    @Test
+    void deberiaActualizarBalanceCuandoElMiembroRecibeUnPago(){
+
+        List<TotalPagadoResponse> totalPagado = List.of(
+            new TotalPagadoResponse(miembroGrupo.getId(), new BigDecimal(300))
+        );
+
+        List<TotalConsumidoResponse> totalConsumido = List.of(
+            new TotalConsumidoResponse(miembroGrupo.getId(), new BigDecimal(200))
+        );
+
+        List<TotalConsumidoResponse> pagosRecibidos = List.of(
+            new TotalConsumidoResponse(miembroGrupo.getId(), new BigDecimal(50))
+        );
+
+        when(miembroGrupoRepository.findByGrupoIdAndEstado(grupo.getId(), EstadoMiembro.ACTIVO)).thenReturn(List.of(miembroGrupo));
+        when(movimientoRepository.obtenerTotalPagadoPorMiembro(grupo.getId())).thenReturn(totalPagado);
+        when(participacionMovimientoRepository.obtenerTotalConsumidoPorMiembro(grupo.getId())).thenReturn(totalConsumido);
+        when(pagoDeudaRepository.obtenerTotalRecibidoEnDeudas(grupo.getId())).thenReturn(pagosRecibidos);
+
+        List<BalanceMiembroResponse> response = balanceServiceImpl.obtenerBalance(grupo.getId());
+
+        assertNotNull(response);
+        assertEquals(new BigDecimal(50), response.get(0).getBalance());
     }
 
 }

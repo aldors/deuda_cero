@@ -153,8 +153,8 @@ public class MovimientoServiceTest {
     void deberiaCrearMovimientoCorrectamente(){
 
         when(groupPermissionService.obtenerMiembroActual(grupo.getId())).thenReturn(miembroGrupo);
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(1L, 1L)).thenReturn(Optional.of(miembroGrupo));
-        when(miembroGrupoRepository.findByGrupoIdAndUsuarioIdIn(1L, List.of(1L))).thenReturn(List.of(miembroGrupo));
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(1L, 1L)).thenReturn(Optional.of(miembroGrupo));
+        when(miembroGrupoRepository.findActivosByGrupoIdAndUsuarioIdIn(1L, List.of(1L))).thenReturn(List.of(miembroGrupo));
         when(movimientoRepository.save(any(Movimiento.class))).thenReturn(movimiento);
         when(participacionMovimientoRepository.saveAll(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -199,7 +199,7 @@ public class MovimientoServiceTest {
     void deberiaLanzarExcepcionSiElMiembroPagadorNoPerteneceAlGrupo(){
 
         when(groupPermissionService.obtenerMiembroActual(grupo.getId())).thenReturn(miembroGrupo);
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuario.getId(), grupo.getId())).thenReturn(Optional.empty());
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuario.getId(), grupo.getId())).thenReturn(Optional.empty());
 
         assertThrows(MiembroPagadorNoPerteneceAlGrupoException.class, () -> movimientoServiceImpl.crearMovimiento(grupo.getId(), crearMovimientoRequest));
     }
@@ -208,8 +208,8 @@ public class MovimientoServiceTest {
     void deberiaLanzarExcepcionSiLosParticipantesNoPertenecenAlGrupo(){
 
         when(groupPermissionService.obtenerMiembroActual(grupo.getId())).thenReturn(miembroGrupo);
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuario.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupo));
-        when(miembroGrupoRepository.findByGrupoIdAndUsuarioIdIn(1L, List.of(1L))).thenReturn(List.of());
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuario.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupo));
+        when(miembroGrupoRepository.findActivosByGrupoIdAndUsuarioIdIn(1L, List.of(1L))).thenReturn(List.of());
 
         assertThrows(ParticipantesNoPertenecenAlGrupoException.class, () -> movimientoServiceImpl.crearMovimiento(grupo.getId(), crearMovimientoRequest));
     }
@@ -218,8 +218,8 @@ public class MovimientoServiceTest {
     void deberiaLanzarExcepcionSiSumaDeMontosNoCoincideConMontoTotal(){
 
         when(groupPermissionService.obtenerMiembroActual(grupo.getId())).thenReturn(miembroGrupo);
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuario.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupo));
-        when(miembroGrupoRepository.findByGrupoIdAndUsuarioIdIn(1L, List.of(1L))).thenReturn(List.of(miembroGrupo));
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuario.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupo));
+        when(miembroGrupoRepository.findActivosByGrupoIdAndUsuarioIdIn(1L, List.of(1L))).thenReturn(List.of(miembroGrupo));
 
         crearMovimientoRequest.setMontoTotal(new BigDecimal(0));
 
