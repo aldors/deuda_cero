@@ -41,6 +41,7 @@ public class SecurityConfig {
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/auth/registro", "/auth/login", "/auth/refresh-token").permitAll()
+                    .requestMatchers("/", "/*.html","/favicon.ico", "/css/**", "/javascript/**", "/error").permitAll()
                     .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
