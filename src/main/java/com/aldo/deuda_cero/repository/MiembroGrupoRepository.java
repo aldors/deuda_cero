@@ -68,4 +68,6 @@ public interface MiembroGrupoRepository extends JpaRepository<MiembroGrupo, Long
 
     List<MiembroGrupo> findByGrupoIdAndEstado(Long grupoId, EstadoMiembro estado);
 
+    long countByGrupoIdAndEstado(Long grupoId, EstadoMiembro estado);
+
 }

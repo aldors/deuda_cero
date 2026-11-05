@@ -50,7 +50,9 @@ public class GrupoServiceImpl implements GrupoService{
 
         miembroGrupoRepository.save(miembroGrupo);
 
-        return GrupoMapper.toResponse(grupo, 1L);
+        long totalMiembros = miembroGrupoRepository.countByGrupoIdAndEstado(grupo.getId(), EstadoMiembro.ACTIVO);
+
+        return GrupoMapper.toResponse(grupo, totalMiembros);
     }
 
     @Override
