@@ -1,20 +1,27 @@
 package com.aldo.deuda_cero.exception;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.aldo.deuda_cero.exception.ApiError.ApiError;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -76,17 +83,89 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
     }
 
+    // Cualquier otro error de autenticacion no controlado
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiError> handleAuthentication(AuthenticationException ex) {
+
+        log.warn("Error de autenticación: {}", ex.getMessage());
+
+        ApiError apiError = new ApiError(
+                HttpStatus.UNAUTHORIZED.value(),
+                "No autenticado",
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
+    }
+
+    // Peticion con JSON mal formado o con un valor de enum inexistente
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiError> handleMessageNotReadable(HttpMessageNotReadableException ex) {
+
+        log.warn("Peticion con cuerpo ilegible: {}", ex.getMessage());
+
+        ApiError apiError = new ApiError(
+                HttpStatus.BAD_REQUEST.value(),
+                "El cuerpo de la petición no es válido o tiene un formato incorrecto",
+                null
+        );
+
+        return ResponseEntity.badRequest().body(apiError);
+    }
+
+    // Un parametro de la URL no se pudo convertir al tipo esperado
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiError> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+
+        String mensaje = "El parámetro '" + ex.getName() + "' tiene un valor inválido";
+
+        ApiError apiError = new ApiError(
+                HttpStatus.BAD_REQUEST.value(),
+                mensaje,
+                List.of(mensaje)
+        );
+
+        return ResponseEntity.badRequest().body(apiError);
+    }
+
+    // Acceso denegado por @PreAuthorize o por reglas de seguridad
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException ex) {
+
+        ApiError apiError = new ApiError(
+                HttpStatus.FORBIDDEN.value(),
+                "No tienes permisos para realizar esta acción",
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(apiError);
+    }
+
+    // Conflictos de integridad de datos (duplicados, constraints, etc.)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiError> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+
+        log.warn("Conflicto de integridad de datos: {}", ex.getMostSpecificCause().getMessage());
+
+        ApiError apiError = new ApiError(
+                HttpStatus.CONFLICT.value(),
+                "No se pudo completar la operación por un conflicto con los datos",
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+    }
+
     // Manejo general de excepciones no controladas
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGeneral(Exception ex) {
 
-        // Modificacion ya que daba errores en DeudaServiceImpl
-        List<String> errores = (ex.getMessage() != null) ? List.of(ex.getMessage()) : Collections.emptyList();
-        
+        log.error("Error no controlado", ex);
+
         ApiError apiError = new ApiError(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Error interno del servidor",
-                errores
+                null
         );
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
@@ -167,12 +246,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleNoPerteneceAlGrupo(NoPerteneceAlGrupoException ex){
 
         ApiError apiError = new ApiError(
-            HttpStatus.BAD_REQUEST.value(),
+            HttpStatus.NOT_FOUND.value(),
             "No pertenece al grupo",
             List.of(ex.getMessage())
         );
 
-        return ResponseEntity.badRequest().body(apiError);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
 
     // EL MIEMBRO DEL GRUPO NO ES ADMINISTRADOR PARA (borrar, editar nombre, etc.) DEL GRUPO
@@ -180,12 +259,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleNoPermisos(NoPermisosException ex){
 
         ApiError apiError = new ApiError(
-            HttpStatus.BAD_REQUEST.value(),
+            HttpStatus.FORBIDDEN.value(),
             "Sin permisos para realizar esta acción",
             List.of(ex.getMessage())
         );
 
-        return ResponseEntity.badRequest().body(apiError);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(apiError);
     }
 
     @ExceptionHandler(InvitacionATiMismoException.class)
@@ -264,12 +343,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleDeudaNoEncontrada(DeudaNoEncontradaException ex){
 
         ApiError apiError = new ApiError(
-            HttpStatus.BAD_REQUEST.value(),
+            HttpStatus.NOT_FOUND.value(),
             "No se encontro la deuda",
             List.of(ex.getMessage())
         );
 
-        return ResponseEntity.badRequest().body(apiError);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
 
     @ExceptionHandler(DeudaNoPerteneceAlGrupoException.class)
@@ -336,12 +415,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleGrupoNoEncontrado(GrupoNoEncontradoException ex){
 
         ApiError apiError = new ApiError(
-            HttpStatus.BAD_REQUEST.value(),
+            HttpStatus.NOT_FOUND.value(),
             "Grupo no encontrado",
             List.of(ex.getMessage())
         );
 
-        return ResponseEntity.badRequest().body(apiError);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
 
     @ExceptionHandler(MontoAPagarDebeSerMayorQueCeroException.class)
