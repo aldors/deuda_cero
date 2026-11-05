@@ -1,5 +1,6 @@
 package com.aldo.deuda_cero.service.implementaciones;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,7 @@ import com.aldo.deuda_cero.entity.Invitacion;
 import com.aldo.deuda_cero.entity.MiembroGrupo;
 import com.aldo.deuda_cero.entity.Usuario;
 import com.aldo.deuda_cero.entity.enums.EstadoInvitacion;
+import com.aldo.deuda_cero.entity.enums.EstadoMiembro;
 import com.aldo.deuda_cero.entity.enums.RolGrupo;
 import com.aldo.deuda_cero.exception.InvitacionATiMismoException;
 import com.aldo.deuda_cero.exception.InvitacionNoEncontrada;
@@ -61,7 +63,7 @@ public class InvitacionServiceImpl implements InvitacionService{
             throw new InvitacionATiMismoException();
         }
 
-        if(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupoId).isPresent()){
+        if(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupoId).isPresent()){
             throw new UsuarioPerteneceAlGrupoException();
         }
 
@@ -80,6 +82,7 @@ public class InvitacionServiceImpl implements InvitacionService{
 
             existente.setEstado(EstadoInvitacion.PENDIENTE);
             existente.setInvitador(usuarioActual);
+            existente.setFechaEnvio(LocalDateTime.now());
 
             existente = invitacionRepository.save(existente);
 
@@ -131,11 +134,15 @@ public class InvitacionServiceImpl implements InvitacionService{
         
         invitacionRepository.save(invitacion);
         
-        MiembroGrupo miembro = MiembroGrupo.builder()
-                .usuario(usuarioActual)
-                .grupo(invitacion.getGrupo())
-                .rol(RolGrupo.MIEMBRO)
-                .build();
+        MiembroGrupo miembro = miembroGrupoRepository
+                .findByUsuarioIdAndGrupoId(usuarioActual.getId(), invitacion.getGrupo().getId())
+                .orElseGet(() -> MiembroGrupo.builder()
+                        .usuario(usuarioActual)
+                        .grupo(invitacion.getGrupo())
+                        .rol(RolGrupo.MIEMBRO)
+                        .build());
+
+        miembro.setEstado(EstadoMiembro.ACTIVO);
 
         miembroGrupoRepository.save(miembro);
 
