@@ -109,14 +109,17 @@ public class GrupoServiceTest {
         when(currentUserService.obtenerUsuarioActual()).thenReturn(new Usuario());
         when(grupoRepository.save(any(Grupo.class))).thenReturn(grupo);
         when(miembroGrupoRepository.save(any(MiembroGrupo.class))).thenReturn(miembroGrupo);
+        when(miembroGrupoRepository.countByGrupoIdAndEstado(grupo.getId(), EstadoMiembro.ACTIVO)).thenReturn(1L);
 
         GrupoResponse response = grupoServiceImpl.crearGrupo(grupoRequest);
 
         assertNotNull(response);
         assertEquals(grupoRequest.getNombre(), response.getNombre());
         assertEquals(grupoRequest.getDescripcion(), response.getDescripcion());
+        assertEquals(1L, response.getTotalMiembros());
 
         verify(grupoRepository).save(any(Grupo.class));
+        verify(miembroGrupoRepository).countByGrupoIdAndEstado(grupo.getId(), EstadoMiembro.ACTIVO);
     }
 
     @Test

@@ -60,7 +60,7 @@ public class BalanceServiceTest {
     void setUp(){
 
         usuario = Usuario.builder()
-            .id(1L)
+            .id(99L)
             .nombre("Aldo")
             .apellido("Test")
             .email("aldo@test.com")

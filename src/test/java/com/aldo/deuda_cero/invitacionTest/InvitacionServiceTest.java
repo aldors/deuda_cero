@@ -3,8 +3,10 @@ package com.aldo.deuda_cero.invitacionTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -137,7 +139,7 @@ public class InvitacionServiceTest {
         doNothing().when(groupPermissionService).validarAdministrador(grupo.getId());
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario);
         when(usuarioRepository.findByEmail(invitarMiembrosRequest.getEmail())).thenReturn(Optional.of(usuarioInvitado));
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupo.getId())).thenReturn(Optional.empty());
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupo.getId())).thenReturn(Optional.empty());
         when(invitacionRepository.findByGrupoIdAndInvitadoId(grupo.getId(), usuarioInvitado.getId())).thenReturn(Optional.empty());
         when(groupPermissionService.obtenerMiembro(grupo.getId(), usuario)).thenReturn(miembroGrupo);
         when(invitacionRepository.save(any(Invitacion.class))).thenReturn(invitacion);
@@ -148,6 +150,8 @@ public class InvitacionServiceTest {
         assertEquals(invitacion.getId(), response.getId());
         assertEquals(invitacion.getGrupo().getNombre(), response.getGrupo());
 
+        verify(miembroGrupoRepository).findActivoByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupo.getId());
+        verify(miembroGrupoRepository, never()).findByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupo.getId());
         verify(invitacionRepository).save(any(Invitacion.class));
 
     }
@@ -179,6 +183,7 @@ public class InvitacionServiceTest {
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario);
         when(invitacionRepository.findById(invitacion.getId())).thenReturn(Optional.of(invitacion));
         when(invitacionRepository.save(any(Invitacion.class))).thenReturn(invitacion);
+        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupo.getId())).thenReturn(Optional.empty());
         when(miembroGrupoRepository.save(any(MiembroGrupo.class))).thenReturn(miembroGrupo);
 
         AceptarInvitacionResponse response = invitacionServiceImpl.aceptarInvitacion(invitacion.getId());
@@ -190,6 +195,38 @@ public class InvitacionServiceTest {
         verify(invitacionRepository).save(any(Invitacion.class));
         verify(miembroGrupoRepository).save(any(MiembroGrupo.class));
         
+    }
+
+    @Test
+    void deberiaReactivarMiembroExistenteAlAceptarInvitacion(){
+
+        usuario.setId(usuarioInvitado.getId());
+
+        LocalDateTime fechaIngresoOriginal = LocalDateTime.now().minusMonths(1);
+
+        MiembroGrupo miembroAbandono = MiembroGrupo.builder()
+            .id(5L)
+            .usuario(usuarioInvitado)
+            .grupo(grupo)
+            .rol(RolGrupo.MIEMBRO)
+            .estado(EstadoMiembro.ABANDONO)
+            .fechaIngreso(fechaIngresoOriginal)
+            .build();
+
+        when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario);
+        when(invitacionRepository.findById(invitacion.getId())).thenReturn(Optional.of(invitacion));
+        when(invitacionRepository.save(any(Invitacion.class))).thenReturn(invitacion);
+        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupo.getId())).thenReturn(Optional.of(miembroAbandono));
+
+        AceptarInvitacionResponse response = invitacionServiceImpl.aceptarInvitacion(invitacion.getId());
+
+        assertNotNull(response);
+        assertEquals(EstadoMiembro.ACTIVO, miembroAbandono.getEstado());
+        assertEquals(RolGrupo.MIEMBRO, miembroAbandono.getRol());
+        assertEquals(fechaIngresoOriginal, miembroAbandono.getFechaIngreso());
+
+        verify(miembroGrupoRepository).save(miembroAbandono);
+
     }
 
     @Test
@@ -240,7 +277,7 @@ public class InvitacionServiceTest {
         doNothing().when(groupPermissionService).validarAdministrador(grupo.getId());
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario);
         when(usuarioRepository.findByEmail(invitarMiembrosRequest.getEmail())).thenReturn(Optional.of(usuarioInvitado));
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupo));
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupo.getId())).thenReturn(Optional.of(miembroGrupo));
 
         assertThrows(UsuarioPerteneceAlGrupoException.class, () -> invitacionServiceImpl.invitarUsuarios(grupo.getId(), invitarMiembrosRequest));
     }
@@ -251,7 +288,7 @@ public class InvitacionServiceTest {
         doNothing().when(groupPermissionService).validarAdministrador(grupo.getId());
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario);
         when(usuarioRepository.findByEmail(invitarMiembrosRequest.getEmail())).thenReturn(Optional.of(usuarioInvitado));
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupo.getId())).thenReturn(Optional.empty());
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupo.getId())).thenReturn(Optional.empty());
         when(invitacionRepository.findByGrupoIdAndInvitadoId(grupo.getId(), usuarioInvitado.getId())).thenReturn(Optional.of(invitacion));
     
         assertThrows(InvitacionPendienteException.class, () -> invitacionServiceImpl.invitarUsuarios(grupo.getId(), invitarMiembrosRequest));
@@ -260,12 +297,15 @@ public class InvitacionServiceTest {
     @Test
     void deberiaReinvitarUsuarioDespuesDeRechazo(){
 
+        LocalDateTime fechaEnvioAnterior = LocalDateTime.now().minusDays(5);
+
         invitacion.setEstado(EstadoInvitacion.RECHAZADA);
+        invitacion.setFechaEnvio(fechaEnvioAnterior);
 
         doNothing().when(groupPermissionService).validarAdministrador(grupo.getId());
         when(currentUserService.obtenerUsuarioActual()).thenReturn(usuario);
         when(usuarioRepository.findByEmail(invitarMiembrosRequest.getEmail())).thenReturn(Optional.of(usuarioInvitado));
-        when(miembroGrupoRepository.findByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupo.getId())).thenReturn(Optional.empty());
+        when(miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuarioInvitado.getId(), grupo.getId())).thenReturn(Optional.empty());
         when(invitacionRepository.findByGrupoIdAndInvitadoId(grupo.getId(), usuarioInvitado.getId())).thenReturn(Optional.of(invitacion));
         when(invitacionRepository.save(any(Invitacion.class))).thenReturn(invitacion);
 
@@ -274,6 +314,7 @@ public class InvitacionServiceTest {
         assertNotNull(response);
         assertEquals(EstadoInvitacion.PENDIENTE, invitacion.getEstado());
         assertEquals(invitacion.getId(), response.getId());
+        assertTrue(invitacion.getFechaEnvio().isAfter(fechaEnvioAnterior));
 
         verify(invitacionRepository).save(any(Invitacion.class));
     }
