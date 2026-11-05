@@ -45,7 +45,9 @@ public class Usuario {
     @Column(nullable = false)
     private String password;
 
-    private Boolean activo;
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean activo = true;
 
     private LocalDateTime fechaCreacion;
 
@@ -61,10 +63,6 @@ public class Usuario {
 
         this.fechaCreacion = ahora;
         this.fechaActualizacion = ahora;
-
-        if (this.activo == null) {
-            this.activo = true;
-        }
 
         if (this.role == null) {
             this.role = Role.USER;
