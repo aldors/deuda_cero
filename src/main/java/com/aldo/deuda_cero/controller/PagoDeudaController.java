@@ -29,7 +29,6 @@ public class PagoDeudaController {
     @PostMapping("/{grupoId}/registrar")
     public ResponseEntity<Void> registrarPago(@PathVariable Long grupoId, @Valid @RequestBody RegistrarPagoRequest registrarPagoRequest){
 
-        // Crear un response para este metodo
         pagoDeudaService.registrarPago(grupoId, registrarPagoRequest);
         return ResponseEntity.ok().build();
     }

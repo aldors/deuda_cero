@@ -84,35 +84,6 @@ public class DashboardServiceImpl implements DashboardService{
             .toList();
     }
 
-
-    /* El metodo construirResumenDeudas esta refactorizado
-    private List<DeudaResumenResponse> construirDebes(List<Deuda> deudas){
-
-        return deudas.stream()
-            .map(deuda -> DeudaResumenResponse.builder()
-                            .deudaId(deuda.getId())
-                            .usuarioId(deuda.getAcreedor().getUsuario().getId())
-                            .nombre(deuda.getAcreedor().getUsuario().getNombre())
-                            .montoPendiente(deuda.getMontoPendiente())
-                            .build()
-            )
-            .toList();
-    }
-
-    private List<DeudaResumenResponse> construirTeDeben(List<Deuda> acreencias){
-
-        return acreencias.stream()
-            .map(deuda -> DeudaResumenResponse.builder()
-                            .deudaId(deuda.getId())
-                            .usuarioId(deuda.getDeudor().getUsuario().getId())
-                            .nombre(deuda.getDeudor().getUsuario().getNombre())
-                            .montoPendiente(deuda.getMontoPendiente())
-                            .build()
-            )
-            .toList();
-    }
-    */
-
     private List<MovimientoRecienteResponse> obtenerMovimientosRecientes(Long grupoId){
 
         return movimientoRepository.findTop10ByGrupoIdOrderByFechaMovimientoDesc(grupoId).stream()

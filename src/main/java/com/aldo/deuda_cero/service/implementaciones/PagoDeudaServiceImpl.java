@@ -48,14 +48,12 @@ public class PagoDeudaServiceImpl implements PagoDeudaService{
     @Override
     public void registrarPago(Long grupoId, RegistrarPagoRequest registrarPagoRequest) {
 
-        //Podemos cambiar a un condificional, ya que el objeto grupo no se usará
         Grupo grupo = grupoRepository.findById(grupoId).
             orElseThrow(() -> new GrupoNoEncontradoException());
 
-        // Este usuario sera automaticamente el PAGADOR
         Usuario usuarioActual = currentUserService.obtenerUsuarioActual();
 
-        MiembroGrupo pagador = miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuarioActual.getId(), grupoId)//
+        MiembroGrupo pagador = miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuarioActual.getId(), grupoId)
             .orElseThrow(() -> new MiembroPagadorNoPerteneceAlGrupoException());
 
         if(registrarPagoRequest.getMonto() == null || registrarPagoRequest.getMonto().compareTo(BigDecimal.ZERO) <= 0){
@@ -80,8 +78,6 @@ public class PagoDeudaServiceImpl implements PagoDeudaService{
         if(registrarPagoRequest.getMonto().compareTo(deuda.getMontoPendiente()) > 0){
             throw new PagoNoPuedeSuperarLaDeudaPendiente();
         }
-
-        //MiembroGrupo receptor = deuda.getAcreedor();
 
         PagoDeuda pago = PagoDeudaMapper.toEntity(registrarPagoRequest, deuda);
 

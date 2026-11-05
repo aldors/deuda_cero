@@ -39,7 +39,6 @@ public class GrupoController {
         return ResponseEntity.ok(grupoService.obtenerMisGrupos());
     }
 
-    //Este si es de este controller
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{grupoId}/miembros")
     public ResponseEntity<List<MiembrosResponse>> obtenerMiembros(@PathVariable Long grupoId){

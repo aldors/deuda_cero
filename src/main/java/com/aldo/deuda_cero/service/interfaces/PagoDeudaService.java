@@ -9,8 +9,4 @@ public interface PagoDeudaService {
     
     void registrarPago(Long grupoId, RegistrarPagoRequest registrarPagoRequest);
     List<PagoResponse> obtenerPagos(Long grupoId);
-
-    //Eso no es parte del MVP por eso se puede dejar para despues.
-    //List<PagoDeudaResponse> obtenerPagos(Long grupoId);
-    //void eliminarPago(Long pagoId);
 }

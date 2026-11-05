@@ -49,14 +49,3 @@ public class MovimientoController {
         );
     }
 }
-
-/*
-
-Movimiento 1:
-
-cecilia paga 200 pesos de un taxi.
-participa: ella, isaac y aldo.
-division de dinero: equitativa
-¿Quien debe?: isaac debe 66.66666667 a cecilia, aldo debe 66.66666667 a cecilia
-
-*/

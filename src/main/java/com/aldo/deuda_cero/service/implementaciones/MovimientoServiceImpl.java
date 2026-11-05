@@ -94,13 +94,6 @@ public class MovimientoServiceImpl implements MovimientoService{
     }
 
 
-    /*
-    Aqui me quede en que la logica repetida la metere dentro de metodos privados
-    aqui en este mismo servicio para no estar repitiendola
-    */
-
-    //Estos metodos privados se reutilizan solo dentro de crearMovimiento()
-
     private List<ImpactoDeudaResponse> crearImpactosDeuda(MiembroGrupo pagador, List<ParticipacionMovimiento> participaciones) {
 
         return participaciones.stream().filter(participacion -> !participacion
@@ -141,7 +134,7 @@ public class MovimientoServiceImpl implements MovimientoService{
         return miembros.stream()
             .collect(Collectors.toMap(
                     mg -> mg.getUsuario().getId(),
-                    Function.identity() // ¿Que hace esto?
+                    Function.identity()
             ));
     }
 
@@ -159,11 +152,9 @@ public class MovimientoServiceImpl implements MovimientoService{
 
     private List<BigDecimal> calcualarMontosIguales(BigDecimal montoTotal, int participantes){
 
-        // return montoTotal.divide(BigDecimal.valueOf(participantes), 2, RoundingMode.HALF_UP);
-
         BigDecimal totalEnCentavos = montoTotal.setScale(2, RoundingMode.HALF_UP);
 
-        BigDecimal montoBase = totalEnCentavos.divide(BigDecimal.valueOf(participantes), 2, RoundingMode.DOWN); // HALF_UP
+        BigDecimal montoBase = totalEnCentavos.divide(BigDecimal.valueOf(participantes), 2, RoundingMode.DOWN);
 
         BigDecimal sumaBase = montoBase.multiply(BigDecimal.valueOf(participantes));
 
@@ -222,10 +213,8 @@ public class MovimientoServiceImpl implements MovimientoService{
             validarMontosPersonalizados(crearMovimientoRequest);
         }
 
-        //for(ParticipanteMovimientoRequest participante : crearMovimientoRequest.getParticipantes()){
         for(int i = 0; i < crearMovimientoRequest.getParticipantes().size(); i++){
 
-            //Esto es nuevo para lo de los centavos en movimientos con division TipoDivision.IGUAL
             ParticipanteMovimientoRequest participante = crearMovimientoRequest.getParticipantes().get(i);
 
             BigDecimal monto = crearMovimientoRequest.getTipoDivision() == TipoDivision.IGUAL ? montoIgual.get(i) : participante.getMonto();
@@ -242,11 +231,4 @@ public class MovimientoServiceImpl implements MovimientoService{
         return participacionMovimientoRepository.saveAll(participaciones);
 
     }
-
-    //DECIRLE A CHAT QUE YA PROBE EL CODIGO Y SI FUNIONA BIEN,
-    //(**por si se me olvida esto** debo investigar a que se refiere con
-    //(Fíjate que aquí no hay búsquedas a la base de datos. Todo ocurre en memoria gracias al Map.) en el metodo
-    //guardarParticipaciones()
-
-    //Y ademas mandarle las clases que me pidio para que las analice
 }

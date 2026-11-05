@@ -145,15 +145,6 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public MeResponse me() {
-        
-        //Aqui quitar las dos primeras lineas y cambiarlo por la clase CurrentUserService del paquete security
-        
-        /*
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        Usuario usuario = usuarioRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("No se encontro el usuario"));
-        */
 
         Usuario usuario = currentUserService.obtenerUsuarioActual();
 

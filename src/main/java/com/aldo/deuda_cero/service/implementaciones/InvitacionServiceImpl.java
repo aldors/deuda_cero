@@ -47,13 +47,9 @@ public class InvitacionServiceImpl implements InvitacionService{
     @Override
     @Transactional
     public InvitacionResponse invitarUsuarios(Long grupoId, InvitarMiembrosRequest invitarMiembrosRequest) {
-        
-        //MiembroGrupo administrador = groupPermissionService.obtenerAdministradorActual(grupoId);
-        
-        ///
+
         groupPermissionService.validarAdministrador(grupoId);
 
-        ///
         Usuario usuarioActual = currentUserService.obtenerUsuarioActual();
 
         Usuario usuarioInvitado = usuarioRepository.findByEmail(invitarMiembrosRequest.getEmail())
@@ -89,7 +85,6 @@ public class InvitacionServiceImpl implements InvitacionService{
             return InvitacionMapper.toResponse(existente);
         }
 
-        ///
         MiembroGrupo administrador = groupPermissionService.obtenerMiembro(grupoId, usuarioActual);
 
         Invitacion invitacion = Invitacion.builder()

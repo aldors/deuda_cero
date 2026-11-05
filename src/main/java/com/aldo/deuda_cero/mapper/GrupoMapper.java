@@ -6,7 +6,6 @@ import com.aldo.deuda_cero.dto.grupo.GrupoRequest;
 import com.aldo.deuda_cero.dto.grupo.GrupoResponse;
 import com.aldo.deuda_cero.entity.Grupo;
 
-// ¿Para que sirve anotarla como @Component y que es y como se usa MapStruct para clases mapper?
 @Component
 public class GrupoMapper {
     

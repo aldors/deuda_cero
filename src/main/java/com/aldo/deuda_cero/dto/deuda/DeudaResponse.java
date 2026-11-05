@@ -10,14 +10,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class DeudaResponse {
-    
-    /* esto no se si se seguira usando
-    private Long deudorId;
-    private String deudor;
-    private Long acreedorId;
-    private String acreedor;
-    private BigDecimal monto;
-    */
 
     private Long id;
     private Long deudorId;
