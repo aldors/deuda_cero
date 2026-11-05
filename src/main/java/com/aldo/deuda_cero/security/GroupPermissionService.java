@@ -39,7 +39,7 @@ public class GroupPermissionService {
 
         MiembroGrupo miembro = obtenerMiembroActual(grupoId);
 
-        if (miembro.getRol() != RolGrupo.AMDIN) {
+        if (miembro.getRol() != RolGrupo.ADMIN) {
             throw new NoPermisosException();
         }
 
@@ -53,7 +53,7 @@ public class GroupPermissionService {
         MiembroGrupo miembro = miembroGrupoRepository.findActivoByUsuarioIdAndGrupoId(usuario.getId(), grupoId)
                 .orElseThrow(() -> new NoPerteneceAlGrupoException());
 
-        if (miembro.getRol() != RolGrupo.AMDIN) {
+        if (miembro.getRol() != RolGrupo.ADMIN) {
             throw new NoPermisosException();
         }
         

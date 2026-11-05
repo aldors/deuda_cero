@@ -27,8 +27,8 @@ import com.aldo.deuda_cero.exception.RefreshTokenNoEncontradoException;
 import com.aldo.deuda_cero.exception.RefreshTokenNoValidoException;
 import com.aldo.deuda_cero.exception.UsuarioNoEncontradoException;
 import com.aldo.deuda_cero.mapper.LoginMapper;
-import com.aldo.deuda_cero.mapper.ResgistroMapper;
-import com.aldo.deuda_cero.repository.RefreshTokenResporitory;
+import com.aldo.deuda_cero.mapper.RegistroMapper;
+import com.aldo.deuda_cero.repository.RefreshTokenRepository;
 import com.aldo.deuda_cero.repository.UsuarioRepository;
 import com.aldo.deuda_cero.security.CurrentUserService;
 import com.aldo.deuda_cero.security.JwtService;
@@ -45,7 +45,7 @@ public class AuthServiceImpl implements AuthService{
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
-    private final RefreshTokenResporitory refreshTokenResporitory;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final CurrentUserService currentUserService;
 
     @Value("${jwt.expirationRefreshToken}")
@@ -58,13 +58,13 @@ public class AuthServiceImpl implements AuthService{
             throw new EmailExistenteException();
         }
 
-        Usuario usuario = ResgistroMapper.toEntity(registroRequest);
+        Usuario usuario = RegistroMapper.toEntity(registroRequest);
 
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
 
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
 
-        return ResgistroMapper.toResponse(usuarioGuardado);
+        return RegistroMapper.toResponse(usuarioGuardado);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class AuthServiceImpl implements AuthService{
         Usuario usuario = usuarioRepository.findByEmail(loginRequest.getEmail())
             .orElseThrow(() -> new UsuarioNoEncontradoException());
         
-        refreshTokenResporitory.deleteByUsuario(usuario);
+        refreshTokenRepository.deleteByUsuario(usuario);
 
         String accessToken = jwtService.generateAccessToken(userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
@@ -93,7 +93,7 @@ public class AuthServiceImpl implements AuthService{
             .expirationDate(LocalDateTime.now().plusSeconds(jwtExpirationRefreshToken / 1000))
             .build();
 
-        refreshTokenResporitory.save(refreshTokenEntity);
+        refreshTokenRepository.save(refreshTokenEntity);
 
         return LoginMapper.toResponse(accessToken, refreshToken);
     }
@@ -102,11 +102,11 @@ public class AuthServiceImpl implements AuthService{
     @Transactional(noRollbackFor = {DisabledException.class, RefreshTokenExpiradoException.class})
     public LoginResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
         
-        RefreshToken refreshTokenEntity = refreshTokenResporitory.findByToken(refreshTokenRequest.getRefreshToken())
+        RefreshToken refreshTokenEntity = refreshTokenRepository.findByToken(refreshTokenRequest.getRefreshToken())
             .orElseThrow(() -> new RefreshTokenNoEncontradoException());
 
         if(refreshTokenEntity.getExpirationDate().isBefore(LocalDateTime.now())){
-            refreshTokenResporitory.deleteByToken(refreshTokenRequest.getRefreshToken());
+            refreshTokenRepository.deleteByToken(refreshTokenRequest.getRefreshToken());
             throw new RefreshTokenExpiradoException();
         }
 
@@ -116,7 +116,7 @@ public class AuthServiceImpl implements AuthService{
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
         if(!userDetails.isEnabled()){
-            refreshTokenResporitory.deleteByUsuario(usuario);
+            refreshTokenRepository.deleteByUsuario(usuario);
             throw new DisabledException("La cuenta está desactivada");
         }
 
@@ -133,11 +133,11 @@ public class AuthServiceImpl implements AuthService{
     @Transactional
     public String logout(LogoutRequest logoutRequest) {
         
-        if(!refreshTokenResporitory.findByToken(logoutRequest.getRefreshToken()).isPresent()){
+        if(!refreshTokenRepository.findByToken(logoutRequest.getRefreshToken()).isPresent()){
             throw new RefreshTokenNoEncontradoException();
         }
 
-        refreshTokenResporitory.deleteByToken(logoutRequest.getRefreshToken());
+        refreshTokenRepository.deleteByToken(logoutRequest.getRefreshToken());
 
         return "Refresh token eliminado / sesion cerrada";
 

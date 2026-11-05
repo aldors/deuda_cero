@@ -45,7 +45,7 @@ public class GrupoServiceImpl implements GrupoService{
         MiembroGrupo miembroGrupo = MiembroGrupo.builder()
             .usuario(usuario)
             .grupo(grupo)
-            .rol(RolGrupo.AMDIN)
+            .rol(RolGrupo.ADMIN)
             .build();
 
         miembroGrupoRepository.save(miembroGrupo);

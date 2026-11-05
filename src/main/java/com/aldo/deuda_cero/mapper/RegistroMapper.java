@@ -7,7 +7,7 @@ import com.aldo.deuda_cero.dto.auth.RegistroResponse;
 import com.aldo.deuda_cero.entity.Usuario;
 
 @Component
-public class ResgistroMapper {
+public class RegistroMapper {
     
     public static Usuario toEntity(RegistroRequest registroRequest){
 

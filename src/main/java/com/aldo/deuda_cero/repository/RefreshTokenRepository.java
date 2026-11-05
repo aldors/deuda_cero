@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.aldo.deuda_cero.entity.RefreshToken;
 import com.aldo.deuda_cero.entity.Usuario;
 
-public interface RefreshTokenResporitory extends JpaRepository<RefreshToken, Long>{
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long>{
 
     Optional<RefreshToken> findByToken(String refreshToken);
     void deleteByToken(String refreshToken);
