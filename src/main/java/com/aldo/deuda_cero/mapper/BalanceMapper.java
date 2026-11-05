@@ -13,7 +13,7 @@ public class BalanceMapper {
     public static BalanceMiembroResponse toResponse(MiembroGrupo miembroGrupo, BigDecimal totalPagado, BigDecimal totalConsumido, BigDecimal balance){
 
         return new BalanceMiembroResponse(
-            miembroGrupo.getUsuario().getId(),
+            miembroGrupo.getId(),
             miembroGrupo.getUsuario().getNombre(),
             totalPagado,
             totalConsumido,
