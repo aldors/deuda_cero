@@ -1,45 +1,5 @@
 let deudasPendientes = [];
 
-function mostrarErrores(elemento, errores) {
-
-    elemento.innerHTML = "";
-
-    if (Array.isArray(errores)) {
-
-        const lista = document.createElement("ul");
-
-        errores.forEach(mensaje => {
-
-            const item = document.createElement("li");
-
-            item.textContent = mensaje;
-
-            lista.appendChild(item);
-
-        });
-
-        elemento.appendChild(lista);
-
-    } else {
-
-        elemento.textContent = errores;
-    }
-}
-
-async function obtenerUsuarioActual() {
-
-    const response = await peticionAutenticada("/auth/me");
-
-    if (!response.ok) {
-        throw await crearErrorDesdeRespuesta(
-            response,
-            "No se pudo obtener la información del usuario"
-        );
-    }
-
-    return response.json();
-}
-
 async function crearErrorDesdeRespuesta(response, mensajePorDefecto) {
 
     let data = null;
@@ -122,46 +82,6 @@ logout.addEventListener("click", async () => {
     console.log("Refresh:", localStorage.getItem("refreshToken"));
 
 });
-
-async function cerrarSesion() {
-
-    const refreshToken = localStorage.getItem("refreshToken");
-
-    try {
-
-        if (refreshToken) {
-
-            const response = await fetch(`${API_URL}/auth/logout`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    refreshToken: refreshToken
-                })
-
-            });
-
-            if (!response.ok) {
-
-                const data = await response.text();
-
-                console.error("No se pudo cerrar la sesión correctamente:", data);
-            }
-        }
-
-    } catch (error) {
-
-        console.error("No se pudo conectar con el servidor:", error);
-
-    } finally {
-
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        window.location.href = "index.html";
-    }
-}
-
 
 async function obtenerDashboardGrupo(grupoId) {
 
@@ -492,18 +412,6 @@ function formatearMonto(monto) {
         style: "currency",
         currency: "MXN"
     }).format(monto);
-}
-
-
-function formatearFecha(fecha) {
-
-    const fechaObj = new Date(fecha);
-
-    return fechaObj.toLocaleDateString("es-MX", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-    });
 }
 
 
@@ -901,23 +809,12 @@ function construirMovimientoRequest() {
 
     const pagadorId =
         Number(document.getElementById("movementPayer").value);
-    
-    //const tipoMovimiento = document.getElementById("movementType").value;
 
     const tipoDivision =
         document.getElementById("movementDivision").value;
 
     const participantes =
         obtenerParticipantesFormulario();
-
-    // Lo puedo quitar cuando use los errores del backend
-    // if (participantes.length === 0) {
-
-    //     throw new Error(
-    //         "Debe seleccionar al menos un participante"
-    //     );
-    // }
-
 
     return {
         descripcion: descripcion,
@@ -963,11 +860,6 @@ async function crearMovimiento() {
 
             const errorData = await response.json();
 
-            // throw new Error(
-            //     errorData.message ||
-            //     "No se pudo crear el movimiento"
-            // );
-
             throw errorData;
         }
 
@@ -989,7 +881,6 @@ async function crearMovimiento() {
 
         const errorContainer = document.getElementById("createMovementError");
 
-        //errorContainer.textContent = error.message;
         mostrarErrores(errorContainer, error.errors || error.message)
 
         errorContainer.classList.remove("hidden");
@@ -1024,50 +915,6 @@ document
         crearMovimiento();
 
     });
-
-
-    //Definir que falta tipo movimiento y que solo hay gasto, ademas decirle que hagamos el cosumo de la 
-    //api para poder crear el movimiento y especificarle que cuando sea personalizada debemos tener
-    //un apartado para agregarles el monto y que el js se tome el id y el monto del usuario y se mande como lista
-    //de participantes y cuando sea igual pues se ponga 0 por defeto o algun valor ya que ahi no importa
-
-//Ver info del movimiento en la consola del navegador
-/*document
-    .getElementById("createMovementForm")
-    .addEventListener("submit", function (event) {
-
-        event.preventDefault();
-
-        const descripcion =
-            document.getElementById("movementDescription").value;
-
-        const monto =
-            document.getElementById("movementAmount").value;
-
-        const pagadorId =
-            document.getElementById("movementPayer").value;
-
-        const division =
-            document.querySelector(
-                'input[name="divisionType"]:checked'
-            ).value;
-
-        const participantes =
-            Array.from(
-                document.querySelectorAll(
-                    'input[name="participantes"]:checked'
-                )
-            ).map(input => Number(input.value));
-
-
-        console.log("Descripción:", descripcion);
-        console.log("Monto:", monto);
-        console.log("Pagador:", pagadorId);
-        console.log("División:", division);
-        console.log("Participantes:", participantes);
-
-    });
-*/
 
 configurarModalInvitacion();
 configurarModalPago();

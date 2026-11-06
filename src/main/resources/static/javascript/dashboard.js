@@ -1,29 +1,3 @@
-function mostrarErrores(elemento, errores) {
-
-    elemento.innerHTML = "";
-
-    if (Array.isArray(errores)) {
-
-        const lista = document.createElement("ul");
-
-        errores.forEach(mensaje => {
-
-            const item = document.createElement("li");
-
-            item.textContent = mensaje;
-
-            lista.appendChild(item);
-
-        });
-
-        elemento.appendChild(lista);
-
-    } else {
-
-        elemento.textContent = errores;
-    }
-}
-
 async function obtenerErroresRespuesta(response, mensajePorDefecto) {
 
     let data = null;
@@ -41,17 +15,6 @@ async function obtenerErroresRespuesta(response, mensajePorDefecto) {
     return (data && (data.message || data.mensaje)) || mensajePorDefecto;
 }
 
-async function obtenerUsuarioActual() {
-
-    const response = await peticionAutenticada("/auth/me");
-
-    if (!response.ok) {
-        throw new Error("No se pudo obtener la información del usuario");
-    }
-
-    return response.json();
-}
-
 const logout = document.getElementById("logoutBtn");
 
 logout.addEventListener("click", async () => {
@@ -63,46 +26,6 @@ logout.addEventListener("click", async () => {
     console.log("Refresh:", localStorage.getItem("refreshToken"));
 
 });
-
-async function cerrarSesion() {
-
-    const refreshToken = localStorage.getItem("refreshToken");
-
-    try {
-
-        if (refreshToken) {
-
-            const response = await fetch(`${API_URL}/auth/logout`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    refreshToken: refreshToken
-                })
-
-            });
-
-            if (!response.ok) {
-
-                const data = await response.text();
-
-                console.error("No se pudo cerrar la sesión correctamente:", data);
-            }
-        }
-
-    } catch (error) {
-
-        console.error("No se pudo conectar con el servidor:", error);
-
-    } finally {
-
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        window.location.href = "index.html";
-    }
-}
-
 
 async function obtenerMisGrupos() {
 
@@ -171,6 +94,9 @@ async function cargarGrupos() {
 
         grupos.forEach(grupo => {
 
+            const inicialGrupo =
+                grupo.nombre.trim().charAt(0).toUpperCase() || "?";
+
             const card = document.createElement("div");
 
             card.classList.add("group-card");
@@ -179,7 +105,7 @@ async function cargarGrupos() {
                 <div class="group-card-top">
 
                     <div class="group-icon">
-                        $
+                        ${inicialGrupo}
                     </div>
 
                     <span class="group-arrow">
@@ -294,7 +220,7 @@ function mostrarInvitaciones(invitaciones) {
                 </span>
 
                 <span>
-                    Fecha de envio: ${formatearFecha(invitacion.fechaEnvio)}
+                    Fecha de envio: ${formatearFecha(invitacion.fechaEnvio, true)}
                 </span>
 
             </div>
@@ -342,21 +268,6 @@ function mostrarInvitaciones(invitaciones) {
 
 
         container.appendChild(card);
-    });
-}
-
-//Prueba para que no aparezca feo en la invitación
-function formatearFecha(fecha) {
-
-    const fechaObj = new Date(fecha);
-
-    return fechaObj.toLocaleString("es-MX", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
     });
 }
 
@@ -637,9 +548,10 @@ async function cargarDashboard() {
             "!";
     }
 
-    await cargarGrupos();
-
-    await cargarInvitaciones();
+    await Promise.all([
+        cargarGrupos(),
+        cargarInvitaciones()
+    ]);
 }
 
 

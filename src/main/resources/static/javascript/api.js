@@ -117,9 +117,108 @@ async function peticionAutenticada(endpoint, opciones = {}) {
     return response;
 }
 
-//async ?
-async function cerrarSesionLocal() {
+function cerrarSesionLocal() {
 
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+}
+
+function mostrarErrores(elemento, errores) {
+
+    elemento.innerHTML = "";
+
+    if (Array.isArray(errores)) {
+
+        const lista = document.createElement("ul");
+
+        errores.forEach(mensaje => {
+
+            const item = document.createElement("li");
+
+            item.textContent = mensaje;
+
+            lista.appendChild(item);
+
+        });
+
+        elemento.appendChild(lista);
+
+    } else {
+
+        elemento.textContent = errores;
+    }
+}
+
+async function cerrarSesion() {
+
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    try {
+
+        if (refreshToken) {
+
+            const response = await fetch(`${API_URL}/auth/logout`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    refreshToken: refreshToken
+                })
+            });
+
+            if (!response.ok) {
+
+                const data = await response.text();
+
+                console.error("No se pudo cerrar la sesión correctamente:", data);
+            }
+        }
+
+    } catch (error) {
+
+        console.error("No se pudo conectar con el servidor:", error);
+
+    } finally {
+
+        cerrarSesionLocal();
+
+        window.location.href = "index.html";
+    }
+}
+
+async function obtenerUsuarioActual() {
+
+    const response = await peticionAutenticada("/auth/me");
+
+    if (!response.ok) {
+
+        const error = new Error("No se pudo obtener la información del usuario");
+
+        error.status = response.status;
+
+        throw error;
+    }
+
+    return response.json();
+}
+
+function formatearFecha(fecha, incluirHora = false) {
+
+    const fechaObj = new Date(fecha);
+
+    const opciones = {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    };
+
+    if (incluirHora) {
+
+        opciones.hour = "2-digit";
+        opciones.minute = "2-digit";
+        opciones.second = "2-digit";
+    }
+
+    return fechaObj.toLocaleString("es-MX", opciones);
 }

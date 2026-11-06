@@ -1,50 +1,3 @@
-function mostrarErrores(elemento, errores) {
-
-    elemento.innerHTML = "";
-
-    if (Array.isArray(errores)) {
-
-        const lista = document.createElement("ul");
-
-        errores.forEach(mensaje => {
-
-            const item = document.createElement("li");
-
-            item.textContent = mensaje;
-
-            lista.appendChild(item);
-
-        });
-
-        elemento.appendChild(lista);
-
-    } else {
-
-        elemento.textContent = errores;
-    }
-}
-
-// Este es un test de que funciona el boton de cerrar sesion
-/*
-const logoutTest = document.getElementById("logoutTest");
-
-logoutTest.addEventListener("click", async () => {
-
-    await cerrarSesion();
-
-    console.log("Tokens después del logout:");
-    console.log("Access:", localStorage.getItem("accessToken"));
-    console.log("Refresh:", localStorage.getItem("refreshToken"));
-
-});
-*/
-
-/*
-- Este fargmento de codigo que esta debajo, tiene la funcion de hacer dinamido el index.html
-    ya que en el index.html esta fusionado registro y login, entonces este codigo permite
-    mostrar el registro cuando se desee registrar y ocultar temporalmente login y viceversa.
-*/
-
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
 
@@ -66,11 +19,6 @@ showLogin.addEventListener("click", () => {
     loginForm.classList.add("active");
 
 });
-
-/*
-- Este fragmento de codigo hace el fetch/conexion/consumo de API
-    POST /auth/registro
-*/
 
 const formRegister = document.getElementById("formRegister");
 const registerMessage = document.getElementById("registerMessage");
@@ -125,11 +73,6 @@ formRegister.addEventListener("submit", async (event) => {
     }
 
 });
-
-/*
-- Este fragmento de codigo hace el fetch/conexion/consumo de API
-    POST /auth/login
-*/
 
 const formLogin = document.getElementById("formLogin");
 const loginMessage = document.getElementById("loginMessage");
@@ -193,58 +136,6 @@ formLogin.addEventListener("submit", async (event) => {
     }
 
 });
-
-/*
-- Este fragmento de codigo hace el fetch/conexion/consumo de API
-    POST /auth/logout
-*/
-
-async function cerrarSesion() {
-
-    const refreshToken = localStorage.getItem("refreshToken");
-
-    if (!refreshToken) {
-
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-
-        return;
-    }
-
-    try {
-
-        const response = await fetch(`${API_URL}/auth/logout`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                refreshToken: refreshToken
-            })
-
-        });
-
-        const data = await response.text();
-
-        if (!response.ok) {
-
-            console.error("No se pudo cerrar la sesión correctamente:", data);
-
-            return;
-        }
-
-        console.log("Sesión cerrada correctamente.");
-
-    } catch (error) {
-
-        console.error("No se pudo conectar con el servidor:", error);
-
-    } finally {
-
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-    }
-}
 
 if (localStorage.getItem("accessToken")) {
     window.location.href = "dashboard.html";
