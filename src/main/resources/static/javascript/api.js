@@ -6,7 +6,9 @@ async function refrescarAccessToken() {
     const refreshToken = localStorage.getItem("refreshToken");
 
     if (!refreshToken) {
-        throw new Error("No existe un refresh token.");
+        const error = new Error("No existe un refresh token.");
+        error.status = 401;
+        throw error;
     }
 
     const response = await fetch(`${API_URL}/auth/refresh-token`, {
@@ -20,17 +22,23 @@ async function refrescarAccessToken() {
 
     });
 
-    const data = await response.json();
+    let data = null;
 
-    if (!response.ok) {
+    try {
+        data = await response.json();
+    } catch (error) {
+        data = null;
+    }
 
-        if (data.errors && Array.isArray(data.errors)) {
-            throw new Error(data.errors.join(", "));
-        }
+    if (!response.ok || !data) {
 
-        throw new Error(
-            data.message || "No se pudo renovar la sesión."
-        );
+        const mensaje = data && data.errors && Array.isArray(data.errors)
+            ? data.errors.join(", ")
+            : (data && data.message) || "No se pudo renovar la sesión.";
+
+        const error = new Error(mensaje);
+        error.status = 401;
+        throw error;
     }
 
     localStorage.setItem("accessToken", data.accessToken);
@@ -45,7 +53,9 @@ async function peticionAutenticada(endpoint, opciones = {}) {
     let accessToken = localStorage.getItem("accessToken");
 
     if (!accessToken) {
-        throw new Error("No existe una sesión activa.");
+        const error = new Error("No existe una sesión activa.");
+        error.status = 401;
+        throw error;
     }
 
     const headers = {
