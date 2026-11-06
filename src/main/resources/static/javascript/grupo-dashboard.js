@@ -31,10 +31,84 @@ async function obtenerUsuarioActual() {
     const response = await peticionAutenticada("/auth/me");
 
     if (!response.ok) {
-        throw new Error("No se pudo obtener la información del usuario");
+        throw await crearErrorDesdeRespuesta(
+            response,
+            "No se pudo obtener la información del usuario"
+        );
     }
 
     return response.json();
+}
+
+async function crearErrorDesdeRespuesta(response, mensajePorDefecto) {
+
+    let data = null;
+
+    try {
+        data = await response.json();
+    } catch (error) {
+        data = null;
+    }
+
+    const mensaje = data && data.errors && Array.isArray(data.errors)
+        ? data.errors.join(", ")
+        : (data && (data.message || data.mensaje)) || mensajePorDefecto;
+
+    const error = new Error(mensaje);
+    error.status = response.status;
+
+    return error;
+}
+
+async function obtenerMisGrupos() {
+
+    const response = await peticionAutenticada("/grupos");
+
+    if (!response.ok) {
+        throw await crearErrorDesdeRespuesta(
+            response,
+            "No se pudieron obtener los grupos"
+        );
+    }
+
+    return response.json();
+}
+
+async function obtenerNombreGrupo(grupoId) {
+
+    const grupos = await obtenerMisGrupos();
+
+    const grupo = grupos.find(g => String(g.id) === String(grupoId));
+
+    if (!grupo) {
+        throw new Error("No se encontró el grupo");
+    }
+
+    return grupo.nombre;
+}
+
+function mostrarErrorDashboard(mensaje) {
+
+    document.getElementById("balanceGeneral").textContent = "—";
+
+    ["debtsYouOwe", "debtsTheyOwe", "recentMovements"].forEach(id => {
+
+        const contenedor = document.getElementById(id);
+
+        contenedor.innerHTML = "";
+
+        const estado = document.createElement("div");
+
+        estado.className = "empty-state";
+
+        const texto = document.createElement("p");
+
+        texto.textContent = mensaje;
+
+        estado.appendChild(texto);
+
+        contenedor.appendChild(estado);
+    });
 }
 
 const logout = document.getElementById("logoutBtn");
@@ -53,39 +127,28 @@ async function cerrarSesion() {
 
     const refreshToken = localStorage.getItem("refreshToken");
 
-    if (!refreshToken) {
-
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-
-        return;
-    }
-
     try {
 
-        const response = await fetch(`${API_URL}/auth/logout`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                refreshToken: refreshToken
-            })
+        if (refreshToken) {
 
-        });
+            const response = await fetch(`${API_URL}/auth/logout`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    refreshToken: refreshToken
+                })
 
-        const data = await response.text();
+            });
 
-        if (!response.ok) {
+            if (!response.ok) {
 
-            console.error("No se pudo cerrar la sesión correctamente:", data);
+                const data = await response.text();
 
-            return;
+                console.error("No se pudo cerrar la sesión correctamente:", data);
+            }
         }
-
-        console.log("Sesión cerrada correctamente.");
-
-        window.location.href = "index.html";
 
     } catch (error) {
 
@@ -95,6 +158,7 @@ async function cerrarSesion() {
 
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        window.location.href = "index.html";
     }
 }
 
@@ -104,6 +168,13 @@ async function obtenerDashboardGrupo(grupoId) {
     const response = await peticionAutenticada(
         `/grupos/${grupoId}/dashboard`
     );
+
+    if (!response.ok) {
+        throw await crearErrorDesdeRespuesta(
+            response,
+            "No se pudo obtener el dashboard del grupo"
+        );
+    }
 
     return response.json();
 }
@@ -115,7 +186,10 @@ async function obtenerMiembrosGrupo(grupoId) {
     );
 
     if (!response.ok) {
-        throw new Error("No se pudieron obtener los miembros del grupo");
+        throw await crearErrorDesdeRespuesta(
+            response,
+            "No se pudieron obtener los miembros del grupo"
+        );
     }
 
     return response.json();
@@ -173,6 +247,9 @@ function configurarModalPago() {
     const errorContainer =
         document.getElementById("paymentError");
 
+    const submitBtn =
+        form.querySelector('button[type="submit"]');
+
 
     function abrirModal() {
 
@@ -181,7 +258,9 @@ function configurarModalPago() {
         if (deudasPendientes.length === 0) {
 
             deudaSelect.innerHTML =
-                "<option>No tienes deudas pendientes</option>";
+                '<option value="">No tienes deudas pendientes</option>';
+
+            submitBtn.disabled = true;
         }
         else {
 
@@ -197,6 +276,8 @@ function configurarModalPago() {
 
                 deudaSelect.appendChild(option);
             });
+
+            submitBtn.disabled = false;
         }
 
         montoInput.value = "";
@@ -233,14 +314,32 @@ function configurarModalPago() {
 
         event.preventDefault();
 
+        if (deudasPendientes.length === 0) {
+            return;
+        }
+
+        const deudaId = Number(deudaSelect.value);
+
+        const monto = Number(montoInput.value);
+
+        if (!deudaId || !monto || monto <= 0) {
+
+            errorContainer.textContent =
+                "Selecciona una deuda e ingresa un monto válido.";
+
+            errorContainer.classList.remove("hidden");
+
+            return;
+        }
+
         try {
 
             const grupoId = obtenerGrupoId();
 
             await registrarPago(
                 grupoId,
-                Number(deudaSelect.value),
-                Number(montoInput.value)
+                deudaId,
+                monto
             );
 
             cerrarModal();
@@ -634,16 +733,14 @@ async function cargarDashboardGrupo() {
 
     try {
 
-       await obtenerUsuarioActual();
-
         const grupoId = obtenerGrupoId();
 
         if (!grupoId) {
             throw new Error("No se recibió el ID del grupo");
         }
 
-        //Aqui muestro el nombre del grupo que esta guardado en el localStorage
-        document.getElementById("groupName").textContent = localStorage.getItem("nombreGrupo");
+        document.getElementById("groupName").textContent =
+            await obtenerNombreGrupo(grupoId);
 
         /*
          * Obtener información del usuario
@@ -717,10 +814,18 @@ async function cargarDashboardGrupo() {
 
         console.error("Error al cargar el dashboard del grupo:", error);
 
-        //No deberiamos cerrar sesion ante cualquier error -> cerrarSesionLocal();
+        if (error.status === 401) {
 
-        window.location.href = "index.html"
+            cerrarSesionLocal();
 
+            window.location.href = "index.html";
+
+            return;
+        }
+
+        mostrarErrorDashboard(
+            error.message || "No se pudo cargar el grupo."
+        );
     }
 }
 

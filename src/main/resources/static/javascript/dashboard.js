@@ -51,38 +51,28 @@ async function cerrarSesion() {
 
     const refreshToken = localStorage.getItem("refreshToken");
 
-    if (!refreshToken) {
-
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-
-        return;
-    }
-
     try {
 
-        const response = await fetch(`${API_URL}/auth/logout`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                refreshToken: refreshToken
-            })
+        if (refreshToken) {
 
-        });
+            const response = await fetch(`${API_URL}/auth/logout`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    refreshToken: refreshToken
+                })
 
-        const data = await response.text();
+            });
 
-        if (!response.ok) {
+            if (!response.ok) {
 
-            console.error("No se pudo cerrar la sesión correctamente:", data);
+                const data = await response.text();
 
-            return;
+                console.error("No se pudo cerrar la sesión correctamente:", data);
+            }
         }
-
-        console.log("Sesión cerrada correctamente.");
-        window.location.href = "index.html";
 
     } catch (error) {
 
@@ -92,6 +82,7 @@ async function cerrarSesion() {
 
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        window.location.href = "index.html";
     }
 }
 
@@ -195,10 +186,6 @@ async function cargarGrupos() {
             card.addEventListener("click", () => {
 
                 window.location.href = `grupo-dashboard.html?grupoId=${grupo.id}`;
-
-                //Eso lo hice yo y no se si sea correcto para mostrar el nombre del
-                //grupo en el dashboard del grupo
-                localStorage.setItem("nombreGrupo", grupo.nombre);
 
             });
 
