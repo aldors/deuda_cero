@@ -93,7 +93,7 @@ formRegister.addEventListener("submit", async (event) => {
 
     try {
 
-        const response = await fetch("http://localhost:8080/auth/registro", {
+        const response = await fetch(`${API_URL}/auth/registro`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -151,7 +151,7 @@ formLogin.addEventListener("submit", async (event) => {
 
     try {
 
-        const response = await fetch("http://localhost:8080/auth/login", {
+        const response = await fetch(`${API_URL}/auth/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -244,4 +244,8 @@ async function cerrarSesion() {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
     }
+}
+
+if (localStorage.getItem("accessToken")) {
+    window.location.href = "dashboard.html";
 }

@@ -1,5 +1,7 @@
 const API_URL = "http://localhost:8080";
 
+let promesaRefresco = null;
+
 
 async function refrescarAccessToken() {
 
@@ -47,7 +49,20 @@ async function refrescarAccessToken() {
 }
 
 
-// Entender como funciona este metodo
+async function obtenerAccessTokenRenovado() {
+
+    if (!promesaRefresco) {
+
+        promesaRefresco = refrescarAccessToken()
+            .finally(() => {
+                promesaRefresco = null;
+            });
+    }
+
+    return promesaRefresco;
+}
+
+
 async function peticionAutenticada(endpoint, opciones = {}) {
 
     let accessToken = localStorage.getItem("accessToken");
@@ -74,7 +89,18 @@ async function peticionAutenticada(endpoint, opciones = {}) {
 
     if (response.status === 401) {
 
-        accessToken = await refrescarAccessToken();
+        try {
+
+            accessToken = await obtenerAccessTokenRenovado();
+
+        } catch (error) {
+
+            cerrarSesionLocal();
+
+            window.location.href = "index.html";
+
+            throw error;
+        }
 
         headers["Authorization"] = `Bearer ${accessToken}`;
 

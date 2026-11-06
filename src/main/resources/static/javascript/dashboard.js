@@ -24,6 +24,23 @@ function mostrarErrores(elemento, errores) {
     }
 }
 
+async function obtenerErroresRespuesta(response, mensajePorDefecto) {
+
+    let data = null;
+
+    try {
+        data = await response.json();
+    } catch (error) {
+        data = null;
+    }
+
+    if (data && Array.isArray(data.errors) && data.errors.length > 0) {
+        return data.errors;
+    }
+
+    return (data && (data.message || data.mensaje)) || mensajePorDefecto;
+}
+
 async function obtenerUsuarioActual() {
 
     const response = await peticionAutenticada("/auth/me");
@@ -333,7 +350,7 @@ function formatearFecha(fecha) {
 
     const fechaObj = new Date(fecha);
 
-    return fechaObj.toLocaleDateString("es-MX", {
+    return fechaObj.toLocaleString("es-MX", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
@@ -535,13 +552,18 @@ async function crearGrupo(event) {
         });
 
 
-        if (!response.ok ) {
+        if (!response.ok) {
 
-            const error = await response.json();
+            const errores = await obtenerErroresRespuesta(
+                response,
+                "No se pudo crear el grupo"
+            );
 
-            // throw new Error(
-            //     error.message || "No se pudo crear el grupo"
-            // );
+            const error = new Error(
+                Array.isArray(errores) ? errores.join(", ") : errores
+            );
+
+            error.errores = errores;
 
             throw error;
 
@@ -557,8 +579,7 @@ async function crearGrupo(event) {
 
         console.error("Error al crear grupo:", error);
 
-        //errorElement.textContent = error.message;
-        mostrarErrores(errorElement, error.errors || error.message);
+        mostrarErrores(errorElement, error.errores || error.message);
 
         errorElement.classList.remove("hidden");
     }
@@ -590,18 +611,35 @@ async function cargarDashboard() {
 
         await cargarUsuario();
 
-        await cargarGrupos();
-
-        await cargarInvitaciones();
-
     } catch (error) {
 
-        console.error("Error al cargar el dashboard:", error);
+        console.error("Error al cargar el usuario:", error);
 
-        cerrarSesionLocal();
+        if (error.status === 401) {
 
-        window.location.href = "index.html";
+            cerrarSesionLocal();
+
+            window.location.href = "index.html";
+
+            return;
+        }
+
+        document.getElementById("userName").textContent =
+            "No disponible";
+
+        document.getElementById("userNameHeader").textContent =
+            "Usuario";
+
+        document.getElementById("userEmail").textContent =
+            "No se pudo cargar la información";
+
+        document.getElementById("userAvatar").textContent =
+            "!";
     }
+
+    await cargarGrupos();
+
+    await cargarInvitaciones();
 }
 
 

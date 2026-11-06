@@ -713,7 +713,24 @@ function cambiarTipoDivision() {
     });
 }
 
+function reiniciarFormularioMovimiento() {
+
+    document.getElementById("createMovementForm").reset();
+
+    const errorContainer =
+        document.getElementById("createMovementError");
+
+    errorContainer.classList.add("hidden");
+
+    errorContainer.textContent = "";
+
+    cambiarTipoDivision();
+}
+
+
 function abrirModalMovimiento() {
+
+    reiniciarFormularioMovimiento();
 
     document
         .getElementById("createMovementModal")
@@ -726,6 +743,8 @@ function cerrarModalMovimiento() {
     document
         .getElementById("createMovementModal")
         .classList.add("hidden");
+
+    reiniciarFormularioMovimiento();
 }
 
 
