@@ -369,6 +369,14 @@ body {
         padding: 25px;
     }
 
+    .info-content h1 {
+        font-size: 34px;
+    }
+
+    .form-header h2 {
+        font-size: 30px;
+    }
+
     .auth-form-container {
         padding: 30px 20px;
     }

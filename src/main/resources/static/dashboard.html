@@ -19,7 +19,7 @@
     <div class="app">
 
         <!-- BARRA LATERAL -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
 
             <div class="logo">
                 <span class="logo-icon">$</span>
@@ -57,12 +57,26 @@
 
         </aside>
 
+        <div id="sidebarOverlay" class="sidebar-overlay hidden"></div>
+
 
         <!-- CONTENIDO PRINCIPAL -->
         <main class="main-content">
 
             <!-- HEADER -->
             <header class="topbar">
+
+                <button
+                    id="menuToggle"
+                    class="menu-toggle"
+                    aria-label="Abrir menú"
+                    aria-controls="sidebar"
+                    aria-expanded="false"
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
 
                 <div class="welcome">
                     <span class="welcome-label">Bienvenido de nuevo</span>

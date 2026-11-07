@@ -916,6 +916,7 @@ document
 
     });
 
+configurarMenuMovil();
 configurarModalInvitacion();
 configurarModalPago();
 cargarDashboardGrupo();

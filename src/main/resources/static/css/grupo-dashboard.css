@@ -575,6 +575,15 @@ a {
     flex-direction: column;
 
     gap: 3px;
+
+    min-width: 0;
+}
+
+
+.debt-info strong,
+.debt-info span {
+
+    overflow-wrap: anywhere;
 }
 
 
@@ -597,6 +606,10 @@ a {
 
 
 .debt-amount {
+
+    flex-shrink: 0;
+
+    margin-left: 12px;
 
     font-family:
         "Bricolage Grotesque",
@@ -653,6 +666,15 @@ a {
     flex-direction: column;
 
     gap: 3px;
+
+    min-width: 0;
+}
+
+
+.movement-info strong,
+.movement-info span {
+
+    overflow-wrap: anywhere;
 }
 
 
@@ -675,6 +697,10 @@ a {
 
 
 .movement-amount {
+
+    flex-shrink: 0;
+
+    margin-left: 12px;
 
     font-family:
         "Bricolage Grotesque",
@@ -893,11 +919,15 @@ a {
 
     max-width: 450px;
 
+    max-height: 90vh;
+
     background: var(--surface);
 
     border-radius: 15px;
 
     padding: 27px;
+
+    overflow-y: auto;
 
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.15);
@@ -1093,65 +1123,163 @@ a {
 }
 
 
+/* MENÚ MÓVIL */
+
+.menu-toggle {
+
+    display: none;
+
+    width: 40px;
+
+    height: 40px;
+
+    flex-shrink: 0;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #eeeeeb;
+
+    color: var(--text-primary);
+}
+
+
+.menu-toggle span {
+
+    display: block;
+
+    width: 18px;
+
+    height: 2px;
+
+    background: currentColor;
+
+    border-radius: 2px;
+}
+
+
+.menu-toggle:hover {
+
+    background: #e5e5e1;
+}
+
+
+.sidebar-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(20, 20, 20, 0.35);
+
+    display: none;
+
+    z-index: 150;
+}
+
+
+body.menu-open {
+
+    overflow: hidden;
+}
+
+
 /* RESPONSIVE */
 
 @media (max-width: 800px) {
 
     .sidebar {
 
-        width: 70px;
+        width: min(280px, 82vw);
 
-        padding: 25px 10px;
+        padding: 26px 18px;
+
+        transform: translateX(-100%);
+
+        transition: transform 0.25s ease, visibility 0.25s ease;
+
+        visibility: hidden;
+
+        overflow-y: auto;
+
+        z-index: 200;
+    }
+
+
+    .sidebar.open {
+
+        transform: translateX(0);
+
+        visibility: visible;
     }
 
 
     .logo {
 
-        justify-content: center;
+        justify-content: flex-start;
 
-        padding: 0;
+        padding: 0 10px;
     }
 
 
     .logo span:last-child {
 
-        display: none;
+        display: inline;
     }
 
 
     .nav-item span:not(.nav-icon),
     .logout-button span:not(.nav-icon) {
 
-        display: none;
+        display: inline;
     }
 
 
     .nav-item,
     .logout-button {
 
-        justify-content: center;
+        justify-content: flex-start;
     }
 
 
     .main-content {
 
-        margin-left: 70px;
+        margin-left: 0;
 
-        width:
-            calc(100% - 70px);
+        width: 100%;
     }
 
 
     .topbar {
 
-        padding: 22px;
+        padding: 18px 20px;
+
+        gap: 12px;
+
+        align-items: flex-start;
+    }
+
+
+    .welcome {
+
+        flex: 1;
+
+        min-width: 0;
     }
 
 
     .content {
 
-        padding:
-            30px 22px;
+        padding: 30px 20px 50px;
     }
 
 
@@ -1161,9 +1289,41 @@ a {
     }
 
 
+    .menu-toggle {
+
+        display: inline-flex;
+    }
+
+
+    .sidebar-overlay:not(.hidden) {
+
+        display: block;
+    }
+
+
     .debts-section {
 
         grid-template-columns: 1fr;
+    }
+
+
+    .group-title-row {
+
+        flex-wrap: wrap;
+
+        gap: 10px;
+    }
+
+
+    .group-title-row h1 {
+
+        flex: 1 1 100%;
+    }
+
+
+    .group-title-row .primary-button {
+
+        flex: 1 1 140px;
     }
 
 }
@@ -1174,12 +1334,80 @@ a {
     .topbar {
 
         align-items: flex-start;
+
+        flex-wrap: wrap;
+
+        padding: 16px;
+    }
+
+
+    .welcome {
+
+        flex: 1 1 100%;
+
+        order: 3;
+    }
+
+
+    .user-info {
+
+        margin-left: auto;
     }
 
 
     .welcome h1 {
 
         font-size: 22px;
+    }
+
+
+    .content {
+
+        padding: 24px 16px 45px;
+    }
+
+
+    .group-title-row {
+
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
+    .group-title-row h1 {
+
+        flex: 0 0 auto;
+    }
+
+
+    .group-title-row .primary-button {
+
+        flex: 0 0 auto;
+
+        width: 100%;
+    }
+
+
+    .section-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 12px;
+    }
+
+
+    .section-header .primary-button {
+
+        align-self: flex-start;
+    }
+
+
+    .balance-card strong {
+
+        font-size: 28px;
     }
 
 
