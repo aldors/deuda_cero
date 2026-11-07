@@ -1,0 +1,54 @@
+.theme-toggle {
+    width: 40px;
+    height: 40px;
+
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--theme-toggle-border, var(--border));
+    border-radius: 10px;
+
+    background: var(--theme-toggle-background, var(--surface-secondary, var(--surface)));
+    color: var(--theme-toggle-color, var(--text-primary, var(--text)));
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.theme-toggle:hover {
+    background: var(--theme-toggle-hover, var(--button-secondary-hover, var(--surface-secondary, var(--surface))));
+}
+
+.theme-toggle:focus-visible {
+    outline: 2px solid var(--theme-toggle-focus, var(--accent, var(--primary)));
+    outline-offset: 2px;
+}
+
+.theme-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.theme-icon-sun {
+    display: none;
+}
+
+[data-theme="oscuro"] .theme-icon-moon {
+    display: none;
+}
+
+[data-theme="oscuro"] .theme-icon-sun {
+    display: block;
+}
+
+.theme-toggle-on-primary {
+    --theme-toggle-background: rgba(255, 255, 255, 0.14);
+    --theme-toggle-hover: rgba(255, 255, 255, 0.24);
+    --theme-toggle-border: rgba(255, 255, 255, 0.3);
+    --theme-toggle-color: #ffffff;
+    --theme-toggle-focus: #ffffff;
+}
