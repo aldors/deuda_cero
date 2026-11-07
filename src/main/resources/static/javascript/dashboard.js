@@ -556,5 +556,6 @@ async function cargarDashboard() {
 
 
 configurarMenuMovil();
+configurarNavegacionMenu();
 
 cargarDashboard();

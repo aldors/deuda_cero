@@ -281,3 +281,66 @@ function configurarMenuMovil() {
         }
     });
 }
+
+function configurarNavegacionMenu() {
+
+    const navItems = document.querySelectorAll('.nav-item[href^="#"]');
+
+    if (navItems.length === 0) {
+        return;
+    }
+
+    const marcarActivo = (itemActivo) => {
+
+        document.querySelectorAll(".nav-item").forEach(item => {
+
+            item.classList.remove("active");
+        });
+
+        itemActivo.classList.add("active");
+    };
+
+    const irASeccion = (hash, suave = true) => {
+
+        const destino = document.querySelector(hash);
+
+        if (!destino) {
+            return;
+        }
+
+        destino.scrollIntoView({
+            behavior: suave ? "smooth" : "auto",
+            block: "start"
+        });
+    };
+
+    navItems.forEach(item => {
+
+        item.addEventListener("click", event => {
+
+            const hash = item.getAttribute("href");
+
+            event.preventDefault();
+
+            marcarActivo(item);
+            irASeccion(hash);
+
+            if (window.location.protocol !== "file:") {
+                history.replaceState(null, "", hash);
+            }
+        });
+    });
+
+    if (window.location.hash) {
+
+        const itemActivo = Array.from(navItems).find(
+            item => item.getAttribute("href") === window.location.hash
+        );
+
+        if (itemActivo) {
+
+            marcarActivo(itemActivo);
+            irASeccion(window.location.hash, false);
+        }
+    }
+}

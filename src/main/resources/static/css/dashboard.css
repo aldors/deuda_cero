@@ -34,11 +34,21 @@
    GENERAL
 ========================= */
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: "Dosis", sans-serif;
     background: var(--background);
     color: var(--text-primary);
     min-height: 100vh;
+}
+
+#inicio,
+#groupsSection,
+#invitationsSection {
+    scroll-margin-top: 24px;
 }
 
 button,

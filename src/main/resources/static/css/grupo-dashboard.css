@@ -40,6 +40,12 @@
 }
 
 
+html {
+
+    scroll-behavior: smooth;
+}
+
+
 body {
 
     font-family: "Dosis", sans-serif;
@@ -49,6 +55,12 @@ body {
     color: var(--text-primary);
 
     min-height: 100vh;
+}
+
+
+#inicio {
+
+    scroll-margin-top: 24px;
 }
 
 
