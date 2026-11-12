@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.aldo.deuda_cero.dto.grupo.AbandonarGrupoResponse;
 import com.aldo.deuda_cero.dto.grupo.GrupoRequest;
 import com.aldo.deuda_cero.dto.grupo.GrupoResponse;
 import com.aldo.deuda_cero.dto.grupo.MiembrosResponse;
@@ -14,6 +15,7 @@ import com.aldo.deuda_cero.entity.Usuario;
 import com.aldo.deuda_cero.entity.enums.EstadoMiembro;
 import com.aldo.deuda_cero.entity.enums.RolGrupo;
 import com.aldo.deuda_cero.exception.GrupoNoEncontradoException;
+import com.aldo.deuda_cero.exception.UnicoAdministradorException;
 import com.aldo.deuda_cero.mapper.GrupoMapper;
 import com.aldo.deuda_cero.repository.GrupoRepository;
 import com.aldo.deuda_cero.repository.MiembroGrupoRepository;
@@ -79,6 +81,39 @@ public class GrupoServiceImpl implements GrupoService{
                     mg.getUsuario().getNombre(),
                     mg.getRol().toString()))
             .toList();
+    }
+
+    @Override
+    @Transactional
+    public AbandonarGrupoResponse abandonarGrupo(Long grupoId) {
+
+        Grupo grupo = grupoRepository.findById(grupoId)
+            .orElseThrow(() -> new GrupoNoEncontradoException());
+        
+        MiembroGrupo miembro = groupPermissionService.obtenerMiembroActual(grupoId);
+
+        if (miembro.getRol() == RolGrupo.ADMIN) {
+
+            long cantidadAdministradores = miembroGrupoRepository.countByGrupoIdAndEstadoAndRol(
+                grupoId, 
+                EstadoMiembro.ACTIVO, 
+                RolGrupo.ADMIN
+            );
+
+            if (cantidadAdministradores <= 1) {
+                throw new UnicoAdministradorException();
+            }
+        }
+
+        miembro.setEstado(EstadoMiembro.ABANDONO);
+        miembroGrupoRepository.save(miembro);
+
+        return new AbandonarGrupoResponse(
+            miembro.getId(), miembro.getUsuario().getNombre(), 
+            grupo.getId(), grupo.getNombre(), 
+            miembro.getEstado()
+        );
+
     }
     
 }
