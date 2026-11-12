@@ -4,11 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.aldo.deuda_cero.dto.grupo.AbandonarGrupoResponse;
 import com.aldo.deuda_cero.dto.grupo.GrupoRequest;
 import com.aldo.deuda_cero.dto.grupo.GrupoResponse;
 import com.aldo.deuda_cero.dto.grupo.MiembrosResponse;
@@ -31,6 +34,7 @@ import com.aldo.deuda_cero.entity.enums.EstadoMiembro;
 import com.aldo.deuda_cero.entity.enums.RolGrupo;
 import com.aldo.deuda_cero.entity.enums.Role;
 import com.aldo.deuda_cero.exception.GrupoNoEncontradoException;
+import com.aldo.deuda_cero.exception.UnicoAdministradorException;
 import com.aldo.deuda_cero.repository.GrupoRepository;
 import com.aldo.deuda_cero.repository.MiembroGrupoRepository;
 import com.aldo.deuda_cero.security.CurrentUserService;
@@ -159,6 +163,46 @@ public class GrupoServiceTest {
     }
 
 
+    @Test
+    void deberiaAbandonarGrupoCorrectamente(){
+
+        miembroGrupo.setRol(RolGrupo.MIEMBRO);
+
+        when(grupoRepository.findById(grupo.getId())).thenReturn(Optional.of(grupo));
+        when(groupPermissionService.obtenerMiembroActual(grupo.getId())).thenReturn(miembroGrupo);
+        when(miembroGrupoRepository.save(any(MiembroGrupo.class))).thenReturn(miembroGrupo);
+
+        AbandonarGrupoResponse response = grupoServiceImpl.abandonarGrupo(grupo.getId());
+
+        assertNotNull(response);
+        assertEquals(grupo.getId(), response.getGrupoId());
+        assertEquals(EstadoMiembro.ABANDONO, response.getEstadoMiembro());
+        assertEquals(EstadoMiembro.ABANDONO, miembroGrupo.getEstado());
+
+        verify(miembroGrupoRepository).save(miembroGrupo);
+    }
+
+    @Test
+    void deberiaAbandonarGrupoSiEsAdminYHayOtroAdmin(){
+
+        miembroGrupo.setRol(RolGrupo.ADMIN);
+
+        when(grupoRepository.findById(grupo.getId())).thenReturn(Optional.of(grupo));
+        when(groupPermissionService.obtenerMiembroActual(grupo.getId())).thenReturn(miembroGrupo);
+        when(miembroGrupoRepository.countByGrupoIdAndEstadoAndRol(
+                grupo.getId(), EstadoMiembro.ACTIVO, RolGrupo.ADMIN))
+                .thenReturn(2L);
+        when(miembroGrupoRepository.save(any(MiembroGrupo.class))).thenReturn(miembroGrupo);
+
+        AbandonarGrupoResponse response = grupoServiceImpl.abandonarGrupo(grupo.getId());
+
+        assertNotNull(response);
+        assertEquals(EstadoMiembro.ABANDONO, miembroGrupo.getEstado());
+
+        verify(miembroGrupoRepository).save(miembroGrupo);
+    }
+
+
     /*Error Path */
     @Test
     void deberiaLanzarExcepcionSiGrupoNoEncontrado(){
@@ -166,5 +210,35 @@ public class GrupoServiceTest {
         when(grupoRepository.existsById(grupo.getId())).thenReturn(false);
 
         assertThrows(GrupoNoEncontradoException.class, () -> grupoServiceImpl.obtenerMiembros(grupo.getId()));
+    }
+
+    @Test
+    void deberiaLanzarExcepcionSiEsElUnicoAdministrador(){
+
+        miembroGrupo.setRol(RolGrupo.ADMIN);
+
+        when(grupoRepository.findById(grupo.getId())).thenReturn(Optional.of(grupo));
+        when(groupPermissionService.obtenerMiembroActual(grupo.getId())).thenReturn(miembroGrupo);
+        when(miembroGrupoRepository.countByGrupoIdAndEstadoAndRol(
+                grupo.getId(), EstadoMiembro.ACTIVO, RolGrupo.ADMIN))
+                .thenReturn(1L);
+
+        assertThrows(UnicoAdministradorException.class,
+                () -> grupoServiceImpl.abandonarGrupo(grupo.getId()));
+
+        assertEquals(EstadoMiembro.ACTIVO, miembroGrupo.getEstado());
+
+        verify(miembroGrupoRepository, never()).save(any(MiembroGrupo.class));
+    }
+
+    @Test
+    void deberiaLanzarExcepcionSiElGrupoNoExisteAlAbandonar(){
+
+        when(grupoRepository.findById(grupo.getId())).thenReturn(Optional.empty());
+
+        assertThrows(GrupoNoEncontradoException.class,
+                () -> grupoServiceImpl.abandonarGrupo(grupo.getId()));
+
+        verify(miembroGrupoRepository, never()).save(any(MiembroGrupo.class));
     }
 }

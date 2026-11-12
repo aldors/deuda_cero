@@ -19,9 +19,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.aldo.deuda_cero.controller.GrupoController;
+import com.aldo.deuda_cero.dto.grupo.AbandonarGrupoResponse;
 import com.aldo.deuda_cero.dto.grupo.GrupoRequest;
 import com.aldo.deuda_cero.dto.grupo.GrupoResponse;
 import com.aldo.deuda_cero.dto.grupo.MiembrosResponse;
+import com.aldo.deuda_cero.entity.enums.EstadoMiembro;
 import com.aldo.deuda_cero.security.CustomUserDetailsService;
 import com.aldo.deuda_cero.security.JwtService;
 import com.aldo.deuda_cero.service.interfaces.GrupoService;
@@ -107,6 +109,29 @@ public class GrupoControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].nombre").value("Aldo"))
         .andExpect(jsonPath("$[0].id").value(2L));
+
+    }
+
+    @Test
+    @WithMockUser
+    void deberiaAbandonarGrupo() throws Exception {
+
+        Long grupoId = 1L;
+
+        AbandonarGrupoResponse response = new AbandonarGrupoResponse(
+            1L, "Aldo", grupoId, "Grupo test", EstadoMiembro.ABANDONO
+        );
+
+        when(grupoService.abandonarGrupo(grupoId)).thenReturn(response);
+
+        mockMvc.perform(
+            post("/grupos/{grupoId}/abandonar", grupoId)
+            .with(csrf())
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.grupoId").value(grupoId))
+        .andExpect(jsonPath("$.nombreGrupo").value("Grupo test"))
+        .andExpect(jsonPath("$.estadoMiembro").value("ABANDONO"));
 
     }
 
