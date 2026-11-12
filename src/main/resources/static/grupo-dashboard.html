@@ -132,6 +132,13 @@
                         + Registrar pago
                     </button>
 
+                    <button
+                        id="leaveGroupBtn"
+                        class="danger-button"
+                    >
+                        Salir del grupo
+                    </button>
+
                 </div>
 
             </div>
@@ -711,6 +718,99 @@
     </div>
 
 </div>
+
+
+<!-- MODAL CONFIRMAR SALIDA DEL GRUPO -->
+<div id="leaveGroupModal" class="modal-overlay notification-overlay hidden">
+
+    <div class="modal notification-card">
+
+        <div class="notification-header">
+
+            <div class="notification-icon notification-icon-warning">
+                !
+            </div>
+
+            <h2>
+                Salir del grupo
+            </h2>
+
+        </div>
+
+        <p class="notification-message">
+            ¿Seguro que quieres salir del grupo? Dejarás de verlo en tu lista de grupos.
+        </p>
+
+        <div class="modal-actions notification-actions">
+
+            <button
+                type="button"
+                id="cancelLeaveGroupBtn"
+                class="secondary-button"
+            >
+                Cancelar
+            </button>
+
+            <button
+                type="button"
+                id="confirmLeaveGroupBtn"
+                class="danger-button"
+            >
+                Salir del grupo
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- NOTIFICACIÓN CENTRAL -->
+<div
+    id="appNotification"
+    class="modal-overlay notification-overlay hidden"
+    role="status"
+    aria-live="polite"
+>
+
+    <div class="modal notification-card">
+
+        <div class="notification-header">
+
+            <div
+                id="appNotificationIcon"
+                class="notification-icon"
+            >
+            </div>
+
+            <h2 id="appNotificationTitle">
+            </h2>
+
+        </div>
+
+        <p
+            id="appNotificationMessage"
+            class="notification-message"
+        >
+        </p>
+
+        <div class="modal-actions notification-actions">
+
+            <button
+                type="button"
+                id="closeAppNotificationBtn"
+                class="primary-button"
+            >
+                Aceptar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
 
 <script src="./javascript/api.js"></script>
 <script src="./javascript/grupo-dashboard.js"></script>

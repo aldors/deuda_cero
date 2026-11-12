@@ -304,6 +304,148 @@ async function invitarMiembro(grupoId, email) {
     return data;
 }
 
+async function abandonarGrupo(grupoId) {
+
+    const response = await peticionAutenticada(
+        `/grupos/${grupoId}/abandonar`,
+        {
+            method: "POST"
+        }
+    );
+
+    if (!response.ok) {
+        throw await crearErrorDesdeRespuesta(
+            response,
+            "No se pudo salir del grupo"
+        );
+    }
+
+    return response.json();
+}
+
+function mostrarNotificacion({
+    tipo = "success",
+    titulo = "",
+    mensaje = "",
+    alCerrar = null
+}) {
+
+    const overlay = document.getElementById("appNotification");
+    const card = overlay.querySelector(".notification-card");
+    const icono = document.getElementById("appNotificationIcon");
+    const tituloElemento = document.getElementById("appNotificationTitle");
+    const mensajeElemento = document.getElementById("appNotificationMessage");
+    const cerrarBoton = document.getElementById("closeAppNotificationBtn");
+
+    const esError = tipo === "error";
+
+    card.classList.remove("notification-success", "notification-error");
+    card.classList.add(esError ? "notification-error" : "notification-success");
+
+    icono.textContent = esError ? "!" : "✓";
+
+    tituloElemento.textContent = titulo || (esError ? "Ocurrió un error" : "Listo");
+
+    mensajeElemento.textContent = mensaje;
+
+    overlay.classList.remove("hidden");
+
+    cerrarBoton.onclick = () => {
+
+        overlay.classList.add("hidden");
+
+        if (typeof alCerrar === "function") {
+
+            alCerrar();
+        }
+    };
+}
+
+function configurarAbandonarGrupo() {
+
+    const boton = document.getElementById("leaveGroupBtn");
+    const modal = document.getElementById("leaveGroupModal");
+    const cancelarBoton = document.getElementById("cancelLeaveGroupBtn");
+    const confirmarBoton = document.getElementById("confirmLeaveGroupBtn");
+
+    if (!boton || !modal || !cancelarBoton || !confirmarBoton) {
+        return;
+    }
+
+    const cerrarModal = () => modal.classList.add("hidden");
+
+    boton.addEventListener("click", () => {
+
+        if (!obtenerGrupoId()) {
+
+            mostrarNotificacion({
+                tipo: "error",
+                titulo: "No se pudo salir del grupo",
+                mensaje: "No se pudo identificar el grupo."
+            });
+
+            return;
+        }
+
+        modal.classList.remove("hidden");
+    });
+
+    cancelarBoton.addEventListener("click", cerrarModal);
+
+    modal.addEventListener("click", event => {
+
+        if (event.target === modal) {
+            cerrarModal();
+        }
+    });
+
+    document.addEventListener("keydown", event => {
+
+        if (event.key === "Escape" && !modal.classList.contains("hidden")) {
+            cerrarModal();
+        }
+    });
+
+    confirmarBoton.addEventListener("click", async () => {
+
+        const grupoId = obtenerGrupoId();
+
+        confirmarBoton.disabled = true;
+
+        try {
+
+            const data = await abandonarGrupo(grupoId);
+
+            cerrarModal();
+
+            mostrarNotificacion({
+                tipo: "success",
+                titulo: "Grupo abandonado",
+                mensaje: `Abandonaste el grupo '${data.nombreGrupo}'`,
+                alCerrar: () => {
+                    window.location.href = "dashboard.html";
+                }
+            });
+
+        } catch (error) {
+
+            console.error("Error al salir del grupo:", error);
+
+            cerrarModal();
+
+            mostrarNotificacion({
+                tipo: "error",
+                titulo: "No se pudo salir del grupo",
+                mensaje: error.message || "No se pudo salir del grupo"
+            });
+
+        } finally {
+
+            confirmarBoton.disabled = false;
+        }
+    });
+}
+
 function configurarModalInvitacion() {
 
     const modal = document.getElementById("inviteMemberModal");
@@ -920,4 +1062,5 @@ configurarMenuMovil();
 configurarNavegacionMenu();
 configurarModalInvitacion();
 configurarModalPago();
+configurarAbandonarGrupo();
 cargarDashboardGrupo();

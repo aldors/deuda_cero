@@ -570,6 +570,46 @@ a {
 }
 
 
+.danger-button {
+
+    border: none;
+
+    border-radius: 8px;
+
+    padding: 10px 16px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+
+    background: var(--danger-background);
+
+    color: var(--danger);
+}
+
+
+.danger-button:hover {
+
+    background: var(--danger);
+
+    color: white;
+
+    transform: translateY(-1px);
+}
+
+
+.danger-button:disabled {
+
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
 /* BALANCE */
 
 .balance-card {
@@ -1163,6 +1203,176 @@ a {
     margin-top: 25px;
 }
 
+
+/* =========================
+   NOTIFICACIONES
+========================= */
+
+.notification-overlay {
+
+    z-index: 200;
+
+    animation: notification-overlay-appear 0.18s ease-out;
+}
+
+
+.notification-card {
+
+    width: 100%;
+
+    max-width: 430px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 0;
+
+    padding: 22px;
+
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    text-align: left;
+
+    animation: notification-appear 0.22s ease-out;
+}
+
+
+.notification-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 16px;
+}
+
+
+.notification-icon {
+
+    width: 42px;
+
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    font-family:
+        "Bricolage Grotesque",
+        sans-serif;
+
+    font-size: 20px;
+
+    font-weight: 700;
+}
+
+
+.notification-icon-warning {
+
+    background: var(--danger-background);
+
+    color: var(--danger);
+}
+
+
+.notification-success .notification-icon {
+
+    background: var(--success-background);
+
+    color: var(--success);
+}
+
+
+.notification-error .notification-icon {
+
+    background: var(--danger-background);
+
+    color: var(--danger);
+}
+
+
+.notification-card h2 {
+
+    font-family:
+        "Bricolage Grotesque",
+        sans-serif;
+
+    font-size: 19px;
+
+    font-weight: 600;
+}
+
+
+.notification-message {
+
+    padding: 14px 16px;
+
+    background: var(--surface-secondary);
+
+    border-radius: 12px;
+
+    color: var(--text-secondary);
+
+    font-size: 14px;
+
+    line-height: 1.55;
+}
+
+
+.notification-actions {
+
+    width: 100%;
+
+    justify-content: flex-end;
+
+    margin-top: 18px;
+
+    padding: 0;
+}
+
+
+@keyframes notification-appear {
+
+    from {
+
+        opacity: 0;
+
+        transform: translateY(10px) scale(0.98);
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+@keyframes notification-overlay-appear {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
 /* EMPTY */
 
 .empty-state {
@@ -1415,7 +1625,8 @@ body.menu-open {
     }
 
 
-    .group-title-row .primary-button {
+    .group-title-row .primary-button,
+    .group-title-row .danger-button {
 
         flex: 1 1 140px;
     }
@@ -1475,7 +1686,8 @@ body.menu-open {
     }
 
 
-    .group-title-row .primary-button {
+    .group-title-row .primary-button,
+    .group-title-row .danger-button {
 
         flex: 0 0 auto;
 
