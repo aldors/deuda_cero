@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.aldo.deuda_cero.dto.grupo.AbandonarGrupoResponse;
 import com.aldo.deuda_cero.dto.grupo.GrupoRequest;
 import com.aldo.deuda_cero.dto.grupo.GrupoResponse;
 import com.aldo.deuda_cero.dto.grupo.MiembrosResponse;
@@ -44,4 +45,11 @@ public class GrupoController {
     public ResponseEntity<List<MiembrosResponse>> obtenerMiembros(@PathVariable Long grupoId){
         return ResponseEntity.ok(grupoService.obtenerMiembros(grupoId));
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{grupoId}/abandonar")
+    public ResponseEntity<AbandonarGrupoResponse> abandonarGrupo(@PathVariable Long grupoId){
+        return ResponseEntity.ok(grupoService.abandonarGrupo(grupoId));
+    }
+    
 }
