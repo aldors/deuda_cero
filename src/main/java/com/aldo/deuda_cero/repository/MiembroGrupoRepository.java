@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import com.aldo.deuda_cero.dto.grupo.GrupoResponse;
 import com.aldo.deuda_cero.entity.MiembroGrupo;
 import com.aldo.deuda_cero.entity.enums.EstadoMiembro;
+import com.aldo.deuda_cero.entity.enums.RolGrupo;
 
 public interface MiembroGrupoRepository extends JpaRepository<MiembroGrupo, Long>{
 
@@ -69,5 +70,7 @@ public interface MiembroGrupoRepository extends JpaRepository<MiembroGrupo, Long
     List<MiembroGrupo> findByGrupoIdAndEstado(Long grupoId, EstadoMiembro estado);
 
     long countByGrupoIdAndEstado(Long grupoId, EstadoMiembro estado);
+
+    long countByGrupoIdAndEstadoAndRol(Long grupoId, EstadoMiembro estado, RolGrupo rol);
 
 }
