@@ -483,4 +483,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(apiError);
     }
 
+    @ExceptionHandler(UnicoAdministradorException.class)
+    public ResponseEntity<ApiError> handleUnicoAdministrador(UnicoAdministradorException ex){
+
+        ApiError apiError = new ApiError(
+            HttpStatus.CONFLICT.value(),
+            "Eres el único administrador del grupo",
+            List.of(ex.getMessage())
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+    }
+
 }
