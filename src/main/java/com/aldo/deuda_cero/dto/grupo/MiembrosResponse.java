@@ -12,4 +12,6 @@ public class MiembrosResponse {
     private Long id;
     private String nombre;
     private String rol;
+    private Long miembroId;
+    private String email;
 }
