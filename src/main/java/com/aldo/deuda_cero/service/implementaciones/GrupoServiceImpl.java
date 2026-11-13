@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.aldo.deuda_cero.dto.grupo.AbandonarGrupoResponse;
+import com.aldo.deuda_cero.dto.grupo.CambiarRolMiembroRequest;
 import com.aldo.deuda_cero.dto.grupo.GrupoRequest;
 import com.aldo.deuda_cero.dto.grupo.GrupoResponse;
 import com.aldo.deuda_cero.dto.grupo.MiembrosResponse;
@@ -15,6 +16,8 @@ import com.aldo.deuda_cero.entity.Usuario;
 import com.aldo.deuda_cero.entity.enums.EstadoMiembro;
 import com.aldo.deuda_cero.entity.enums.RolGrupo;
 import com.aldo.deuda_cero.exception.GrupoNoEncontradoException;
+import com.aldo.deuda_cero.exception.MiembroNoEncontradoException;
+import com.aldo.deuda_cero.exception.NoPuedesQuitarteAdminException;
 import com.aldo.deuda_cero.exception.UnicoAdministradorException;
 import com.aldo.deuda_cero.mapper.GrupoMapper;
 import com.aldo.deuda_cero.repository.GrupoRepository;
@@ -79,7 +82,10 @@ public class GrupoServiceImpl implements GrupoService{
             .map(mg -> new MiembrosResponse(
                     mg.getUsuario().getId(),
                     mg.getUsuario().getNombre(),
-                    mg.getRol().toString()))
+                    mg.getRol().toString(),
+                    mg.getId(),
+                    mg.getUsuario().getEmail()
+                    ))
             .toList();
     }
 
@@ -114,6 +120,56 @@ public class GrupoServiceImpl implements GrupoService{
             miembro.getEstado()
         );
 
+    }
+
+    // Método para dar y quitar permisos de administrador a un miembro del grupo
+    @Override
+    @Transactional
+    public MiembrosResponse cambiarRolMiembro(Long grupoId, Long miembroId, CambiarRolMiembroRequest rolRequest) {
+
+        MiembroGrupo administradorActual = groupPermissionService.obtenerAdministradorActual(grupoId);
+
+        MiembroGrupo miembro = miembroGrupoRepository.findByIdAndGrupoIdAndEstado(miembroId, grupoId, EstadoMiembro.ACTIVO)
+            .orElseThrow(() -> new MiembroNoEncontradoException());
+
+        if (miembro.getRol() == rolRequest.getRol()) {
+
+            return new MiembrosResponse(
+                miembro.getUsuario().getId(),
+                miembro.getUsuario().getNombre(),
+                miembro.getRol().toString(),
+                miembro.getId(),
+                miembro.getUsuario().getEmail()
+            );
+        }
+
+        if (miembro.getId().equals(administradorActual.getId()) && rolRequest.getRol() == RolGrupo.MIEMBRO) {
+            throw new NoPuedesQuitarteAdminException();
+        }
+
+        if (miembro.getRol() == RolGrupo.ADMIN && rolRequest.getRol() == RolGrupo.MIEMBRO) {
+
+            long cantidadAdministradores = miembroGrupoRepository.countByGrupoIdAndEstadoAndRol(
+                grupoId, 
+                EstadoMiembro.ACTIVO, 
+                RolGrupo.ADMIN
+            );
+
+            if (cantidadAdministradores <= 1) {
+                throw new UnicoAdministradorException();
+            }
+        }
+
+        miembro.setRol(rolRequest.getRol());
+        miembroGrupoRepository.save(miembro);
+
+        return new MiembrosResponse(
+            miembro.getUsuario().getId(),
+            miembro.getUsuario().getNombre(),
+            miembro.getRol().toString(),
+            miembro.getId(),
+            miembro.getUsuario().getEmail()
+        );
     }
     
 }

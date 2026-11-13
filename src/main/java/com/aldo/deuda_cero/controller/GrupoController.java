@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aldo.deuda_cero.dto.grupo.AbandonarGrupoResponse;
+import com.aldo.deuda_cero.dto.grupo.CambiarRolMiembroRequest;
 import com.aldo.deuda_cero.dto.grupo.GrupoRequest;
 import com.aldo.deuda_cero.dto.grupo.GrupoResponse;
 import com.aldo.deuda_cero.dto.grupo.MiembrosResponse;
@@ -50,6 +52,16 @@ public class GrupoController {
     @PostMapping("/{grupoId}/abandonar")
     public ResponseEntity<AbandonarGrupoResponse> abandonarGrupo(@PathVariable Long grupoId){
         return ResponseEntity.ok(grupoService.abandonarGrupo(grupoId));
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping("/{grupoId}/miembros/{miembroId}/rol")
+    public ResponseEntity<MiembrosResponse> cambiarRolMiembro(
+            @PathVariable Long grupoId,
+            @PathVariable Long miembroId,
+            @Valid @RequestBody CambiarRolMiembroRequest request){
+
+        return ResponseEntity.ok(grupoService.cambiarRolMiembro(grupoId, miembroId, request));
     }
     
 }
