@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.aldo.deuda_cero.dto.grupo.AbandonarGrupoResponse;
+import com.aldo.deuda_cero.dto.grupo.CambiarRolMiembroRequest;
 import com.aldo.deuda_cero.dto.grupo.GrupoRequest;
 import com.aldo.deuda_cero.dto.grupo.GrupoResponse;
 import com.aldo.deuda_cero.dto.grupo.MiembrosResponse;
@@ -34,6 +35,9 @@ import com.aldo.deuda_cero.entity.enums.EstadoMiembro;
 import com.aldo.deuda_cero.entity.enums.RolGrupo;
 import com.aldo.deuda_cero.entity.enums.Role;
 import com.aldo.deuda_cero.exception.GrupoNoEncontradoException;
+import com.aldo.deuda_cero.exception.MiembroNoEncontradoException;
+import com.aldo.deuda_cero.exception.NoPermisosException;
+import com.aldo.deuda_cero.exception.NoPuedesQuitarteAdminException;
 import com.aldo.deuda_cero.exception.UnicoAdministradorException;
 import com.aldo.deuda_cero.repository.GrupoRepository;
 import com.aldo.deuda_cero.repository.MiembroGrupoRepository;
@@ -238,6 +242,173 @@ public class GrupoServiceTest {
 
         assertThrows(GrupoNoEncontradoException.class,
                 () -> grupoServiceImpl.abandonarGrupo(grupo.getId()));
+
+        verify(miembroGrupoRepository, never()).save(any(MiembroGrupo.class));
+    }
+
+    private MiembroGrupo crearMiembro(RolGrupo rol) {
+
+        Usuario otroUsuario = Usuario.builder()
+            .id(2L)
+            .nombre("Maria")
+            .apellido("Test")
+            .email("maria@test.com")
+            .password("test123")
+            .activo(true)
+            .role(Role.USER)
+            .build();
+
+        return MiembroGrupo.builder()
+            .id(10L)
+            .usuario(otroUsuario)
+            .grupo(grupo)
+            .rol(rol)
+            .estado(EstadoMiembro.ACTIVO)
+            .fechaIngreso(LocalDateTime.now())
+            .build();
+    }
+
+    @Test
+    void deberiaPromoverMiembroAAdmin(){
+
+        MiembroGrupo objetivo = crearMiembro(RolGrupo.MIEMBRO);
+
+        when(groupPermissionService.obtenerAdministradorActual(grupo.getId())).thenReturn(miembroGrupo);
+        when(miembroGrupoRepository.findByIdAndGrupoIdAndEstado(
+                objetivo.getId(), grupo.getId(), EstadoMiembro.ACTIVO))
+                .thenReturn(Optional.of(objetivo));
+        when(miembroGrupoRepository.save(any(MiembroGrupo.class))).thenReturn(objetivo);
+
+        MiembrosResponse response = grupoServiceImpl.cambiarRolMiembro(
+            grupo.getId(), objetivo.getId(),
+            new CambiarRolMiembroRequest(RolGrupo.ADMIN)
+        );
+
+        assertNotNull(response);
+        assertEquals(RolGrupo.ADMIN, objetivo.getRol());
+        assertEquals("ADMIN", response.getRol());
+        assertEquals(objetivo.getId(), response.getMiembroId());
+        assertEquals("maria@test.com", response.getEmail());
+
+        verify(miembroGrupoRepository).save(objetivo);
+    }
+
+    @Test
+    void deberiaQuitarAdminSiHayOtroAdmin(){
+
+        MiembroGrupo objetivo = crearMiembro(RolGrupo.ADMIN);
+
+        when(groupPermissionService.obtenerAdministradorActual(grupo.getId())).thenReturn(miembroGrupo);
+        when(miembroGrupoRepository.findByIdAndGrupoIdAndEstado(
+                objetivo.getId(), grupo.getId(), EstadoMiembro.ACTIVO))
+                .thenReturn(Optional.of(objetivo));
+        when(miembroGrupoRepository.countByGrupoIdAndEstadoAndRol(
+                grupo.getId(), EstadoMiembro.ACTIVO, RolGrupo.ADMIN))
+                .thenReturn(2L);
+        when(miembroGrupoRepository.save(any(MiembroGrupo.class))).thenReturn(objetivo);
+
+        MiembrosResponse response = grupoServiceImpl.cambiarRolMiembro(
+            grupo.getId(), objetivo.getId(),
+            new CambiarRolMiembroRequest(RolGrupo.MIEMBRO)
+        );
+
+        assertNotNull(response);
+        assertEquals(RolGrupo.MIEMBRO, objetivo.getRol());
+        assertEquals("MIEMBRO", response.getRol());
+
+        verify(miembroGrupoRepository).save(objetivo);
+    }
+
+    @Test
+    void deberiaSerIdempotenteSiElRolEsElMismo(){
+
+        MiembroGrupo objetivo = crearMiembro(RolGrupo.ADMIN);
+
+        when(groupPermissionService.obtenerAdministradorActual(grupo.getId())).thenReturn(miembroGrupo);
+        when(miembroGrupoRepository.findByIdAndGrupoIdAndEstado(
+                objetivo.getId(), grupo.getId(), EstadoMiembro.ACTIVO))
+                .thenReturn(Optional.of(objetivo));
+
+        MiembrosResponse response = grupoServiceImpl.cambiarRolMiembro(
+            grupo.getId(), objetivo.getId(),
+            new CambiarRolMiembroRequest(RolGrupo.ADMIN)
+        );
+
+        assertNotNull(response);
+        assertEquals("ADMIN", response.getRol());
+
+        verify(miembroGrupoRepository, never()).save(any(MiembroGrupo.class));
+    }
+
+    @Test
+    void deberiaLanzarExcepcionSiNoEsAdministrador(){
+
+        when(groupPermissionService.obtenerAdministradorActual(grupo.getId()))
+                .thenThrow(new NoPermisosException());
+
+        assertThrows(NoPermisosException.class,
+                () -> grupoServiceImpl.cambiarRolMiembro(
+                    grupo.getId(), 10L,
+                    new CambiarRolMiembroRequest(RolGrupo.ADMIN)));
+
+        verify(miembroGrupoRepository, never()).save(any(MiembroGrupo.class));
+    }
+
+    @Test
+    void deberiaLanzarExcepcionSiElMiembroNoExiste(){
+
+        when(groupPermissionService.obtenerAdministradorActual(grupo.getId())).thenReturn(miembroGrupo);
+        when(miembroGrupoRepository.findByIdAndGrupoIdAndEstado(
+                10L, grupo.getId(), EstadoMiembro.ACTIVO))
+                .thenReturn(Optional.empty());
+
+        assertThrows(MiembroNoEncontradoException.class,
+                () -> grupoServiceImpl.cambiarRolMiembro(
+                    grupo.getId(), 10L,
+                    new CambiarRolMiembroRequest(RolGrupo.ADMIN)));
+
+        verify(miembroGrupoRepository, never()).save(any(MiembroGrupo.class));
+    }
+
+    @Test
+    void deberiaLanzarExcepcionSiEsElUltimoAdminAlQuitarAdmin(){
+
+        MiembroGrupo objetivo = crearMiembro(RolGrupo.ADMIN);
+
+        when(groupPermissionService.obtenerAdministradorActual(grupo.getId())).thenReturn(miembroGrupo);
+        when(miembroGrupoRepository.findByIdAndGrupoIdAndEstado(
+                objetivo.getId(), grupo.getId(), EstadoMiembro.ACTIVO))
+                .thenReturn(Optional.of(objetivo));
+        when(miembroGrupoRepository.countByGrupoIdAndEstadoAndRol(
+                grupo.getId(), EstadoMiembro.ACTIVO, RolGrupo.ADMIN))
+                .thenReturn(1L);
+
+        assertThrows(UnicoAdministradorException.class,
+                () -> grupoServiceImpl.cambiarRolMiembro(
+                    grupo.getId(), objetivo.getId(),
+                    new CambiarRolMiembroRequest(RolGrupo.MIEMBRO)));
+
+        assertEquals(RolGrupo.ADMIN, objetivo.getRol());
+
+        verify(miembroGrupoRepository, never()).save(any(MiembroGrupo.class));
+    }
+
+    @Test
+    void deberiaLanzarExcepcionSiIntentaQuitarseAdminAsiMismo(){
+
+        miembroGrupo.setRol(RolGrupo.ADMIN);
+
+        when(groupPermissionService.obtenerAdministradorActual(grupo.getId())).thenReturn(miembroGrupo);
+        when(miembroGrupoRepository.findByIdAndGrupoIdAndEstado(
+                miembroGrupo.getId(), grupo.getId(), EstadoMiembro.ACTIVO))
+                .thenReturn(Optional.of(miembroGrupo));
+
+        assertThrows(NoPuedesQuitarteAdminException.class,
+                () -> grupoServiceImpl.cambiarRolMiembro(
+                    grupo.getId(), miembroGrupo.getId(),
+                    new CambiarRolMiembroRequest(RolGrupo.MIEMBRO)));
+
+        assertEquals(RolGrupo.ADMIN, miembroGrupo.getRol());
 
         verify(miembroGrupoRepository, never()).save(any(MiembroGrupo.class));
     }
