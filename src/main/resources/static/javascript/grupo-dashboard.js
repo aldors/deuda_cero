@@ -785,6 +785,12 @@ function mostrarMiembros(miembros, usuario) {
 
     const esAdminActual = miembroActual && miembroActual.rol === "ADMIN";
 
+    const invitacionBtn = document.getElementById("inviteMemberBtn");
+
+    if (invitacionBtn) {
+        invitacionBtn.classList.toggle("hidden", !esAdminActual);
+    }
+
     miembros.forEach(miembro => {
 
         const esAdmin = miembro.rol === "ADMIN";
