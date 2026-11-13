@@ -1,5 +1,7 @@
 let deudasPendientes = [];
 
+let usuarioActual = null;
+
 async function crearErrorDesdeRespuesta(response, mensajePorDefecto) {
 
     let data = null;
@@ -109,6 +111,29 @@ async function obtenerMiembrosGrupo(grupoId) {
         throw await crearErrorDesdeRespuesta(
             response,
             "No se pudieron obtener los miembros del grupo"
+        );
+    }
+
+    return response.json();
+}
+
+async function cambiarRolMiembro(grupoId, miembroId, rol) {
+
+    const response = await peticionAutenticada(
+        `/grupos/${grupoId}/miembros/${miembroId}/rol`,
+        {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ rol })
+        }
+    );
+
+    if (!response.ok) {
+        throw await crearErrorDesdeRespuesta(
+            response,
+            "No se pudo cambiar el rol del miembro"
         );
     }
 
@@ -733,6 +758,144 @@ function cargarMiembrosEnFormulario(miembros) {
     });
 }
 
+function mostrarMiembros(miembros, usuario) {
+
+    const contenedor = document.getElementById("membersList");
+
+    if (!contenedor) {
+        return;
+    }
+
+    contenedor.innerHTML = "";
+
+    if (!miembros || miembros.length === 0) {
+
+        contenedor.innerHTML = `
+            <div class="empty-state">
+                <p>No hay miembros activos en este grupo.</p>
+            </div>
+        `;
+
+        return;
+    }
+
+    const miembroActual = miembros.find(
+        miembro => miembro.email === usuario.email
+    );
+
+    const esAdminActual = miembroActual && miembroActual.rol === "ADMIN";
+
+    miembros.forEach(miembro => {
+
+        const esAdmin = miembro.rol === "ADMIN";
+
+        const esMiembroActual = miembro === miembroActual;
+
+        const fila = document.createElement("div");
+        fila.className = "member-row";
+
+        const info = document.createElement("div");
+        info.className = "member-info";
+
+        const badge = document.createElement("span");
+        badge.className = `role-badge ${esAdmin ? "role-badge--admin" : "role-badge--member"}`;
+        badge.textContent = esAdmin ? "Admin" : "Miembro";
+
+        const detalles = document.createElement("div");
+        detalles.className = "member-details";
+
+        const nombre = document.createElement("span");
+        nombre.className = "member-name";
+        nombre.textContent = miembro.nombre;
+
+        const email = document.createElement("span");
+        email.className = "member-email";
+        email.textContent = miembro.email;
+
+        detalles.appendChild(nombre);
+        detalles.appendChild(email);
+
+        info.appendChild(badge);
+        info.appendChild(detalles);
+
+        const acciones = document.createElement("div");
+        acciones.className = "member-actions";
+
+        if (esAdminActual && !esMiembroActual) {
+
+            const boton = document.createElement("button");
+
+            boton.className = esAdmin ? "danger-button" : "primary-button";
+            boton.textContent = esAdmin ? "Quitar admin" : "Hacer admin";
+
+            boton.addEventListener("click", () => {
+
+                manejarCambioRol(
+                    miembro,
+                    esAdmin ? "MIEMBRO" : "ADMIN",
+                    boton
+                );
+            });
+
+            acciones.appendChild(boton);
+        }
+
+        fila.appendChild(info);
+        fila.appendChild(acciones);
+
+        contenedor.appendChild(fila);
+    });
+}
+
+async function manejarCambioRol(miembro, rol, boton) {
+
+    const grupoId = obtenerGrupoId();
+
+    if (!grupoId) {
+
+        mostrarNotificacion({
+            tipo: "error",
+            titulo: "No se pudo cambiar el rol",
+            mensaje: "No se pudo identificar el grupo."
+        });
+
+        return;
+    }
+
+    boton.disabled = true;
+
+    try {
+
+        await cambiarRolMiembro(grupoId, miembro.miembroId, rol);
+
+        const miembros = await obtenerMiembrosGrupo(grupoId);
+
+        mostrarMiembros(miembros, usuarioActual);
+
+        mostrarNotificacion({
+            tipo: "success",
+            titulo: rol === "ADMIN"
+                ? "Administrador agregado"
+                : "Administrador removido",
+            mensaje: rol === "ADMIN"
+                ? `${miembro.nombre} ahora es administrador del grupo.`
+                : `${miembro.nombre} ya no es administrador del grupo.`
+        });
+
+    } catch (error) {
+
+        console.error("Error al cambiar el rol del miembro:", error);
+
+        boton.disabled = false;
+
+        mostrarNotificacion({
+            tipo: "error",
+            titulo: "No se pudo cambiar el rol",
+            mensaje: error.message || "No se pudo cambiar el rol del miembro."
+        });
+    }
+}
+
 function cambiarTipoDivision() {
 
     const tipoDivision =
@@ -817,6 +980,8 @@ async function cargarDashboardGrupo() {
 
         const usuario = await obtenerUsuarioActual();
 
+        usuarioActual = usuario;
+
         document.getElementById("userNameHeader").textContent =
             usuario.nombre;
 
@@ -842,6 +1007,7 @@ async function cargarDashboardGrupo() {
         const miembros = await obtenerMiembrosGrupo(grupoId);
         console.log("Miembros del grupo:", miembros);
         cargarMiembrosEnFormulario(miembros);
+        mostrarMiembros(miembros, usuario);
 
 
         /*
