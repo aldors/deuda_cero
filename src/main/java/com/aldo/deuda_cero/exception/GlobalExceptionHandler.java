@@ -495,4 +495,28 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
     }
 
+    @ExceptionHandler(MiembroNoEncontradoException.class)
+    public ResponseEntity<ApiError> handleMiembroNoEncontrado(MiembroNoEncontradoException ex){
+
+        ApiError apiError = new ApiError(
+            HttpStatus.NOT_FOUND.value(),
+            "Miembro no encontrado",
+            List.of(ex.getMessage())
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+    }
+
+    @ExceptionHandler(NoPuedesQuitarteAdminException.class)
+    public ResponseEntity<ApiError> handleNoPuedesQuitarteAdmin(NoPuedesQuitarteAdminException ex){
+
+        ApiError apiError = new ApiError(
+            HttpStatus.FORBIDDEN.value(),
+            "No puedes quitarte el rol de administrador a ti mismo",
+            List.of(ex.getMessage())
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(apiError);
+    }
+
 }
